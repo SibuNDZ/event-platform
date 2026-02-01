@@ -43,17 +43,22 @@ RUN pnpm run build
 WORKDIR /app/packages/api
 RUN pnpm run build
 
-# Stage 3: Production
-FROM node:20-alpine AS runner
+# Stage 3: Production (use Debian for better Prisma compatibility)
+FROM node:20-slim AS runner
 
-# Install build tools for native modules and OpenSSL 1.1 for Prisma
-RUN apk add --no-cache libc6-compat openssl1.1-compat python3 make g++ && apk upgrade
+# Install build tools for native modules
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nestjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 --gid nodejs nestjs
 
 # Copy built application
 COPY --from=builder /app/packages/api/dist ./dist
@@ -91,7 +96,7 @@ RUN npx prisma@5.22.0 generate --schema=./prisma/schema.prisma
 RUN npm rebuild bcrypt sharp || true
 
 # Clean up build tools
-RUN apk del python3 make g++
+RUN apt-get purge -y python3 make g++ && apt-get autoremove -y
 
 # Set ownership
 RUN chown -R nestjs:nodejs /app
@@ -106,7 +111,7 @@ EXPOSE 3001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
 
 # Start the application
 CMD ["node", "dist/main.js"]
