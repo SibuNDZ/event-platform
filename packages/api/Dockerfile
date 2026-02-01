@@ -81,6 +81,9 @@ RUN node -e " \
 # Install production dependencies with npm (avoids pnpm symlink issues)
 RUN npm install --omit=dev --ignore-scripts
 
+# Install dependencies for workspace packages we copied manually
+RUN npm install nanoid@5 zod@3 @prisma/client@5.22.0 --ignore-scripts
+
 # Generate Prisma client (pin to v5 to match schema)
 RUN npx prisma@5.22.0 generate --schema=./prisma/schema.prisma
 
