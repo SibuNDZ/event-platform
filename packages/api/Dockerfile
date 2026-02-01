@@ -46,8 +46,8 @@ RUN pnpm run build
 # Stage 3: Production
 FROM node:20-alpine AS runner
 
-# Install build tools for native modules (bcrypt, sharp)
-RUN apk add --no-cache libc6-compat python3 make g++ && apk upgrade
+# Install build tools for native modules and OpenSSL 1.1 for Prisma
+RUN apk add --no-cache libc6-compat openssl1.1-compat python3 make g++ && apk upgrade
 
 WORKDIR /app
 
