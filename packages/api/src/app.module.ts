@@ -11,6 +11,7 @@ import { TenantModule } from './core/tenant/tenant.module';
 import { CacheModule } from './core/cache/cache.module';
 import { QueueModule } from './core/queue/queue.module';
 import { StorageModule } from './core/storage/storage.module';
+import { EventsModule as CoreEventsModule } from './core/events/events.module';
 
 // Feature modules
 import { OrganizationsModule } from './modules/organizations/organizations.module';
@@ -23,6 +24,8 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { BadgesModule } from './modules/badges/badges.module';
 import { CommunicationsModule } from './modules/communications/communications.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
 
 // Interceptors
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -66,6 +69,7 @@ import { HealthController } from './health.controller';
     CacheModule,
     QueueModule,
     StorageModule,
+    CoreEventsModule,
 
     // Feature modules
     OrganizationsModule,
@@ -78,6 +82,8 @@ import { HealthController } from './health.controller';
     BadgesModule,
     CommunicationsModule,
     AnalyticsModule,
+    WebhooksModule,
+    IntegrationsModule,
   ],
   providers: [
     {
