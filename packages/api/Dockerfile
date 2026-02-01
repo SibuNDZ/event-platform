@@ -6,8 +6,8 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Stage 2: Install dependencies
-FROM base AS deps
+# Stage 2: Install dependencies and build
+FROM base AS builder
 
 # Copy workspace config
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
@@ -21,23 +21,11 @@ COPY packages/typescript-config/package.json ./packages/typescript-config/
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-# Stage 3: Build
-FROM base AS builder
-
-WORKDIR /app
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/api/node_modules ./packages/api/node_modules
-COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
-
 # Copy source files
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/shared ./packages/shared
 COPY packages/database ./packages/database
 COPY packages/api ./packages/api
-COPY pnpm-workspace.yaml package.json ./
 
 # Generate Prisma client
 WORKDIR /app/packages/database
@@ -55,7 +43,14 @@ RUN pnpm run build
 WORKDIR /app/packages/api
 RUN pnpm run build
 
-# Stage 4: Production
+# Deploy API with all dependencies (resolves pnpm symlinks)
+WORKDIR /app
+RUN pnpm deploy --filter=@event-platform/api --prod /app/deploy
+
+# Copy Prisma client to deploy directory
+RUN cp -r /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma /app/deploy/node_modules/.prisma
+
+# Stage 3: Production
 FROM node:20-alpine AS runner
 
 # Install security updates
@@ -67,11 +62,8 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
-# Copy only necessary files for production
-COPY --from=builder --chown=nestjs:nodejs /app/packages/api/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/packages/api/package.json ./package.json
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/packages/api/node_modules ./packages/api/node_modules
+# Copy deployed application (includes node_modules without symlinks)
+COPY --from=builder --chown=nestjs:nodejs /app/deploy ./
 
 # Copy Prisma schema for migrations
 COPY --from=builder --chown=nestjs:nodejs /app/packages/database/prisma ./prisma
