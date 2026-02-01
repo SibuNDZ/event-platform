@@ -107,8 +107,9 @@ export default function Home() {
               {[
                 {
                   name: 'Standard',
-                  price: '$15,000',
+                  price: 'R275,000',
                   period: '/year',
+                  slug: 'standard',
                   features: [
                     'Unlimited internal events',
                     'Up to 1,000 attendees/event',
@@ -119,8 +120,9 @@ export default function Home() {
                 },
                 {
                   name: 'Professional',
-                  price: '$40,000',
+                  price: 'R735,000',
                   period: '/year',
+                  slug: 'professional',
                   popular: true,
                   features: [
                     'Everything in Standard',
@@ -135,6 +137,7 @@ export default function Home() {
                   name: 'Enterprise',
                   price: 'Custom',
                   period: '',
+                  slug: 'enterprise',
                   features: [
                     'Everything in Professional',
                     'Unlimited attendees',
@@ -181,12 +184,14 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className="w-full"
-                    variant={plan.popular ? 'default' : 'outline'}
-                  >
-                    Get Started
-                  </Button>
+                  <Link href={plan.slug === 'enterprise' ? '/demo' : `/register?plan=${plan.slug}`}>
+                    <Button
+                      className="w-full"
+                      variant={plan.popular ? 'default' : 'outline'}
+                    >
+                      Get Started
+                    </Button>
+                  </Link>
                 </div>
               ))}
             </div>
