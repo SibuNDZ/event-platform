@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { CurrentUser, Organization, AuthTokens } from '@/stores/auth-store';
+import type { CurrentUser, Organization } from '@/stores/auth-store';
 
 export interface LoginRequest {
   email: string;
