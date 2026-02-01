@@ -81,8 +81,8 @@ RUN node -e " \
 # Install production dependencies with npm (avoids pnpm symlink issues)
 RUN npm install --omit=dev --ignore-scripts
 
-# Generate Prisma client
-RUN npx prisma generate --schema=./prisma/schema.prisma
+# Generate Prisma client (pin to v5 to match schema)
+RUN npx prisma@5.22.0 generate --schema=./prisma/schema.prisma
 
 # Rebuild native modules
 RUN npm rebuild bcrypt sharp || true
