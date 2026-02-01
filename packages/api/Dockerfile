@@ -70,7 +70,13 @@ COPY --from=builder /app/packages/database/prisma ./prisma
 
 # Remove workspace references from package.json (npm doesn't understand them)
 # We copy these packages manually above
-RUN sed -i '/"@event-platform\/database"/d; /"@event-platform\/shared"/d' package.json
+RUN node -e " \
+  const pkg = require('./package.json'); \
+  delete pkg.dependencies['@event-platform/database']; \
+  delete pkg.dependencies['@event-platform/shared']; \
+  delete pkg.devDependencies; \
+  require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2)); \
+"
 
 # Install production dependencies with npm (avoids pnpm symlink issues)
 RUN npm install --omit=dev --ignore-scripts
