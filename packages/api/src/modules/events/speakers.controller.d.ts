@@ -1,0 +1,87 @@
+import { SpeakersService } from './speakers.service';
+export declare class SpeakersController {
+    private readonly speakersService;
+    constructor(speakersService: SpeakersService);
+    create(eventId: string, dto: any): Promise<{
+        id: string;
+        eventId: string;
+        email: string | null;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        company: string | null;
+        bio: string | null;
+        photoUrl: string | null;
+        linkedinUrl: string | null;
+        twitterUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        attendeeId: string | null;
+        isVisible: boolean;
+        sortOrder: number;
+        websiteUrl: string | null;
+        title: string | null;
+    }>;
+    findAll(eventId: string): Promise<{
+        id: string;
+        eventId: string;
+        email: string | null;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        company: string | null;
+        bio: string | null;
+        photoUrl: string | null;
+        linkedinUrl: string | null;
+        twitterUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        attendeeId: string | null;
+        isVisible: boolean;
+        sortOrder: number;
+        websiteUrl: string | null;
+        title: string | null;
+    }[]>;
+    findOne(id: string): Promise<{
+        id: string;
+        eventId: string;
+        email: string | null;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        company: string | null;
+        bio: string | null;
+        photoUrl: string | null;
+        linkedinUrl: string | null;
+        twitterUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        attendeeId: string | null;
+        isVisible: boolean;
+        sortOrder: number;
+        websiteUrl: string | null;
+        title: string | null;
+    }>;
+    update(id: string, dto: any): Promise<{
+        id: string;
+        eventId: string;
+        email: string | null;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        company: string | null;
+        bio: string | null;
+        photoUrl: string | null;
+        linkedinUrl: string | null;
+        twitterUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        attendeeId: string | null;
+        isVisible: boolean;
+        sortOrder: number;
+        websiteUrl: string | null;
+        title: string | null;
+    }>;
+    delete(id: string): Promise<void>;
+}
+//# sourceMappingURL=speakers.controller.d.ts.map

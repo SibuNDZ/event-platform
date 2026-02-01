@@ -1,0 +1,83 @@
+import { SessionsService, CreateSessionDto, UpdateSessionDto } from './sessions.service';
+export declare class SessionsController {
+    private readonly sessionsService;
+    constructor(sessionsService: SessionsService);
+    create(eventId: string, dto: Omit<CreateSessionDto, 'eventId'>): Promise<{
+        id: string;
+        eventId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        sortOrder: number;
+        title: string;
+        startTime: Date;
+        isLive: boolean;
+        endTime: Date;
+        track: string | null;
+        roomName: string | null;
+        capacity: number | null;
+        streamUrl: string | null;
+        recordingUrl: string | null;
+        requiresTicket: boolean;
+        allowedTicketTypes: string[];
+    }>;
+    findAll(eventId: string): Promise<{
+        id: string;
+        eventId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        sortOrder: number;
+        title: string;
+        startTime: Date;
+        isLive: boolean;
+        endTime: Date;
+        track: string | null;
+        roomName: string | null;
+        capacity: number | null;
+        streamUrl: string | null;
+        recordingUrl: string | null;
+        requiresTicket: boolean;
+        allowedTicketTypes: string[];
+    }[]>;
+    findOne(id: string): Promise<{
+        id: string;
+        eventId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        sortOrder: number;
+        title: string;
+        startTime: Date;
+        isLive: boolean;
+        endTime: Date;
+        track: string | null;
+        roomName: string | null;
+        capacity: number | null;
+        streamUrl: string | null;
+        recordingUrl: string | null;
+        requiresTicket: boolean;
+        allowedTicketTypes: string[];
+    }>;
+    update(id: string, dto: UpdateSessionDto): Promise<{
+        id: string;
+        eventId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        sortOrder: number;
+        title: string;
+        startTime: Date;
+        isLive: boolean;
+        endTime: Date;
+        track: string | null;
+        roomName: string | null;
+        capacity: number | null;
+        streamUrl: string | null;
+        recordingUrl: string | null;
+        requiresTicket: boolean;
+        allowedTicketTypes: string[];
+    }>;
+    delete(id: string): Promise<void>;
+}
+//# sourceMappingURL=sessions.controller.d.ts.map

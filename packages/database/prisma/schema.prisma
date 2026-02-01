@@ -1,0 +1,1467 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  OWNER
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum EventType {
+  IN_PERSON
+  VIRTUAL
+  HYBRID
+}
+
+enum TicketStatus {
+  ACTIVE
+  USED
+  CANCELLED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+  ADYEN
+  PAYU
+  WOMPI
+  MERCADOPAGO
+  FREE
+}
+
+enum AttendeeType {
+  GENERAL
+  VIP
+  SPEAKER
+  SPONSOR
+  EXHIBITOR
+  STAFF
+  PRESS
+}
+
+enum CheckpointType {
+  MAIN_ENTRANCE
+  SESSION
+  ACTIVITY
+  BOOTH
+  CUSTOM
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum LicenseTier {
+  STANDARD
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  TRIALING
+}
+
+enum FormFieldType {
+  TEXT
+  EMAIL
+  PHONE
+  NUMBER
+  TEXTAREA
+  SELECT
+  MULTI_SELECT
+  CHECKBOX
+  RADIO
+  DATE
+  TIME
+  FILE
+  COUNTRY
+  CUSTOM
+}
+
+// ==================== ORGANIZATIONS (Tenants) ====================
+
+model Organization {
+  id                String             @id @default(cuid())
+  name              String
+  slug              String             @unique
+  logoUrl           String?
+  websiteUrl        String?
+
+  // Subscription & License
+  licenseTier       LicenseTier        @default(STANDARD)
+  subscriptionId    String?
+  subscriptionStatus SubscriptionStatus @default(TRIALING)
+  trialEndsAt       DateTime?
+
+  // Settings
+  timezone          String             @default("UTC")
+  currency          String             @default("USD")
+  locale            String             @default("en")
+
+  // White Label (Enterprise)
+  customDomain      String?            @unique
+  emailDomain       String?
+  brandingConfig    Json?              // Colors, fonts, etc.
+
+  // Compliance
+  dataResidency     String             @default("US") // US, EU, etc.
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  members           OrganizationMember[]
+  events            Event[]
+  invitations       Invitation[]
+  apiKeys           ApiKey[]
+  webhooks          Webhook[]
+  auditLogs         AuditLog[]
+  emailTemplates    EmailTemplate[]
+
+  @@index([slug])
+  @@index([customDomain])
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  role           UserRole     @default(STAFF)
+  permissions    Json?        // Custom permissions override
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+// ==================== USERS ====================
+
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  passwordHash      String?
+  firstName         String
+  lastName          String
+  avatarUrl         String?
+  phone             String?
+
+  // Auth
+  emailVerified     Boolean             @default(false)
+  emailVerifiedAt   DateTime?
+  mfaEnabled        Boolean             @default(false)
+  mfaSecret         String?
+
+  // SSO
+  ssoProvider       String?             // azure-ad, saml
+  ssoProviderId     String?
+
+  status            UserStatus          @default(ACTIVE)
+  lastLoginAt       DateTime?
+
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  memberships       OrganizationMember[]
+  refreshTokens     RefreshToken[]
+  sessions          Session[]
+  invitationsSent   Invitation[]        @relation("InvitedBy")
+  auditLogs         AuditLog[]
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  deviceInfo  String?
+  ipAddress   String?
+
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  deviceInfo  String?
+  ipAddress   String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Invitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  role           UserRole     @default(STAFF)
+  token          String       @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  invitedById    String
+
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy      User         @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([organizationId])
+  @@index([token])
+}
+
+// ==================== EVENTS ====================
+
+model Event {
+  id              String        @id @default(cuid())
+  organizationId  String
+
+  // Basic Info
+  name            String
+  slug            String
+  description     String?
+  shortDescription String?
+
+  // Type & Status
+  type            EventType     @default(IN_PERSON)
+  status          EventStatus   @default(DRAFT)
+
+  // Dates
+  startDate       DateTime
+  endDate         DateTime
+  timezone        String
+
+  // Location (for in-person/hybrid)
+  venueName       String?
+  venueAddress    String?
+  venueCity       String?
+  venueCountry    String?
+  venueLatitude   Float?
+  venueLongitude  Float?
+
+  // Virtual (for virtual/hybrid)
+  virtualPlatformUrl String?
+  streamConfig    Json?
+
+  // Media
+  coverImageUrl   String?
+  logoUrl         String?
+  bannerUrl       String?
+
+  // Website & SEO
+  websiteEnabled  Boolean       @default(true)
+  customDomain    String?       @unique
+  seoTitle        String?
+  seoDescription  String?
+  seoKeywords     String[]
+
+  // Settings
+  currency        String        @default("USD")
+  maxAttendees    Int?
+  isPublic        Boolean       @default(true)
+  requireApproval Boolean       @default(false)
+
+  // Analytics
+  googleAnalyticsId String?
+  facebookPixelId   String?
+
+  // Compliance
+  privacyPolicyUrl  String?
+  termsUrl          String?
+
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessions        EventSession[]
+  speakers        Speaker[]
+  sponsors        Sponsor[]
+  ticketTypes     TicketType[]
+  registrationForms RegistrationForm[]
+  coupons         Coupon[]
+  attendees       Attendee[]
+  orders          Order[]
+  checkpoints     Checkpoint[]
+  badgeTemplates  BadgeTemplate[]
+  emailCampaigns  EmailCampaign[]
+  surveys         Survey[]
+  websitePages    WebsitePage[]
+  livePolls       LivePoll[]
+  chatRooms       ChatRoom[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([status])
+  @@index([startDate])
+}
+
+model EventSession {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  title           String
+  description     String?
+
+  // Timing
+  startTime       DateTime
+  endTime         DateTime
+
+  // Location/Track
+  track           String?
+  roomName        String?
+  capacity        Int?
+
+  // Virtual
+  streamUrl       String?
+  recordingUrl    String?
+  isLive          Boolean       @default(false)
+
+  // Access Control
+  requiresTicket  Boolean       @default(false)
+  allowedTicketTypes String[]   // Ticket type IDs
+
+  sortOrder       Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speakers        SessionSpeaker[]
+  checkIns        SessionCheckIn[]
+  livePolls       LivePoll[]
+  qnaQuestions    QnAQuestion[]
+
+  @@index([eventId])
+  @@index([startTime])
+}
+
+model Speaker {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String?
+
+  title           String?       // Job title
+  company         String?
+  bio             String?
+  photoUrl        String?
+
+  // Social
+  linkedinUrl     String?
+  twitterUrl      String?
+  websiteUrl      String?
+
+  // If speaker is also an attendee
+  attendeeId      String?       @unique
+
+  sortOrder       Int           @default(0)
+  isVisible       Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  attendee        Attendee?     @relation(fields: [attendeeId], references: [id])
+  sessions        SessionSpeaker[]
+
+  @@index([eventId])
+}
+
+model SessionSpeaker {
+  id          String       @id @default(cuid())
+  sessionId   String
+  speakerId   String
+  role        String?      // keynote, panelist, moderator
+  sortOrder   Int          @default(0)
+
+  session     EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  speaker     Speaker      @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, speakerId])
+}
+
+model Sponsor {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+  logoUrl         String?
+  websiteUrl      String?
+
+  tier            String        // platinum, gold, silver, bronze, etc.
+  sortOrder       Int           @default(0)
+  isVisible       Boolean       @default(true)
+
+  // Booth/Lead Capture
+  boothNumber     String?
+  boothLocation   String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  leads           Lead[]
+
+  @@index([eventId])
+}
+
+// ==================== REGISTRATION ====================
+
+model TicketType {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+
+  // Pricing
+  price           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+
+  // Availability
+  quantity        Int?          // null = unlimited
+  quantitySold    Int           @default(0)
+  maxPerOrder     Int           @default(10)
+  minPerOrder     Int           @default(1)
+
+  // Sales Period
+  salesStartDate  DateTime?
+  salesEndDate    DateTime?
+
+  // Early Bird
+  earlyBirdPrice  Decimal?      @db.Decimal(10, 2)
+  earlyBirdEndDate DateTime?
+
+  // Attendee Type
+  attendeeType    AttendeeType  @default(GENERAL)
+
+  // Access
+  allowedSessions String[]      // Session IDs this ticket grants access to
+
+  // Settings
+  isVisible       Boolean       @default(true)
+  isTransferable  Boolean       @default(false)
+  requiresApproval Boolean      @default(false)
+
+  sortOrder       Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[]
+  tickets         Ticket[]
+
+  @@index([eventId])
+}
+
+model RegistrationForm {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+
+  isDefault       Boolean       @default(false)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  fields          FormField[]
+
+  @@index([eventId])
+}
+
+model FormField {
+  id              String        @id @default(cuid())
+  formId          String
+
+  name            String
+  label           String
+  type            FormFieldType
+  placeholder     String?
+  helpText        String?
+
+  // Validation
+  isRequired      Boolean       @default(false)
+  minLength       Int?
+  maxLength       Int?
+  pattern         String?       // Regex pattern
+
+  // Options (for select, radio, checkbox)
+  options         Json?
+
+  // Conditional Logic
+  conditions      Json?         // Show/hide based on other fields
+
+  sortOrder       Int           @default(0)
+  isEnabled       Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  form            RegistrationForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@index([formId])
+}
+
+model Coupon {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  code            String
+  description     String?
+
+  discountType    DiscountType
+  discountValue   Decimal       @db.Decimal(10, 2)
+
+  // Limits
+  maxUses         Int?          // null = unlimited
+  maxUsesPerUser  Int           @default(1)
+  currentUses     Int           @default(0)
+
+  // Validity
+  validFrom       DateTime?
+  validUntil      DateTime?
+
+  // Restrictions
+  minOrderAmount  Decimal?      @db.Decimal(10, 2)
+  applicableTicketTypes String[] // Empty = all types
+
+  isActive        Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orders          Order[]
+
+  @@unique([eventId, code])
+  @@index([eventId])
+  @@index([code])
+}
+
+// ==================== ATTENDEES & ORDERS ====================
+
+model Attendee {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  // Contact Info
+  email           String
+  firstName       String
+  lastName        String
+  phone           String?
+
+  // Profile
+  company         String?
+  jobTitle        String?
+  bio             String?
+  photoUrl        String?
+
+  // Social
+  linkedinUrl     String?
+  twitterUrl      String?
+
+  // Type
+  attendeeType    AttendeeType  @default(GENERAL)
+
+  // Custom Fields
+  customFields    Json?
+
+  // Networking
+  isNetworkingEnabled Boolean   @default(true)
+  networkingProfile   Json?     // Interests, looking for, etc.
+
+  // Status
+  isApproved      Boolean       @default(true)
+  approvedAt      DateTime?
+  approvedBy      String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[]
+  tickets         Ticket[]
+  checkIns        CheckIn[]
+  sessionCheckIns SessionCheckIn[]
+  speaker         Speaker?
+  meetingsAsRequester Meeting[]  @relation("MeetingRequester")
+  meetingsAsReceiver  Meeting[]  @relation("MeetingReceiver")
+  leads           Lead[]
+  pollResponses   PollResponse[]
+  chatMessages    ChatMessage[]
+  surveyResponses SurveyResponse[]
+
+  @@unique([eventId, email])
+  @@index([eventId])
+  @@index([email])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  eventId         String
+  organizationId  String
+
+  orderNumber     String        @unique
+
+  // Customer
+  customerEmail   String
+  customerFirstName String
+  customerLastName  String
+  customerPhone   String?
+  billingAddress  Json?
+
+  // Pricing
+  subtotal        Decimal       @db.Decimal(10, 2)
+  discountAmount  Decimal       @default(0) @db.Decimal(10, 2)
+  taxAmount       Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+
+  // Coupon
+  couponId        String?
+  couponCode      String?
+
+  // Status
+  status          OrderStatus   @default(PENDING)
+
+  // Notes
+  notes           String?
+  internalNotes   String?
+
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  refundedAt      DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  coupon          Coupon?       @relation(fields: [couponId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
+  invoices        Invoice[]
+
+  @@index([eventId])
+  @@index([orderNumber])
+  @@index([customerEmail])
+  @@index([status])
+}
+
+model OrderItem {
+  id              String        @id @default(cuid())
+  orderId         String
+  ticketTypeId    String
+  attendeeId      String?
+
+  quantity        Int           @default(1)
+  unitPrice       Decimal       @db.Decimal(10, 2)
+  totalPrice      Decimal       @db.Decimal(10, 2)
+
+  // Attendee Info (at time of order)
+  attendeeEmail   String?
+  attendeeFirstName String?
+  attendeeLastName  String?
+  customFields    Json?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType      TicketType    @relation(fields: [ticketTypeId], references: [id])
+  attendee        Attendee?     @relation(fields: [attendeeId], references: [id])
+  ticket          Ticket?
+
+  @@index([orderId])
+  @@index([ticketTypeId])
+}
+
+model Payment {
+  id              String          @id @default(cuid())
+  orderId         String
+
+  amount          Decimal         @db.Decimal(10, 2)
+  currency        String          @default("USD")
+
+  provider        PaymentProvider
+  providerPaymentId String?       // Stripe payment_intent, PayPal transaction ID, etc.
+  providerCustomerId String?
+
+  status          PaymentStatus   @default(PENDING)
+
+  // Refund tracking
+  refundedAmount  Decimal         @default(0) @db.Decimal(10, 2)
+  refundReason    String?
+
+  // Metadata
+  metadata        Json?
+  receiptUrl      String?
+
+  paidAt          DateTime?
+  failedAt        DateTime?
+  refundedAt      DateTime?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([providerPaymentId])
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  orderId         String
+
+  invoiceNumber   String        @unique
+
+  // Amounts
+  subtotal        Decimal       @db.Decimal(10, 2)
+  taxAmount       Decimal       @default(0) @db.Decimal(10, 2)
+  discountAmount  Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+
+  // Tax Details
+  taxRate         Decimal?      @db.Decimal(5, 2)
+  taxId           String?       // VAT number, etc.
+
+  // PDF
+  pdfUrl          String?
+
+  issuedAt        DateTime      @default(now())
+  dueDate         DateTime?
+  paidAt          DateTime?
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([invoiceNumber])
+}
+
+// ==================== TICKETS & CHECK-IN ====================
+
+model Ticket {
+  id              String        @id @default(cuid())
+  ticketTypeId    String
+  orderItemId     String        @unique
+  attendeeId      String
+
+  // Unique Identifiers
+  ticketNumber    String        @unique
+  qrCode          String        @unique
+  qrCodeUrl       String?
+
+  status          TicketStatus  @default(ACTIVE)
+
+  // PDF Ticket
+  pdfUrl          String?
+
+  // Transfer
+  isTransferred   Boolean       @default(false)
+  originalAttendeeId String?
+  transferredAt   DateTime?
+
+  // Delivery
+  sentByEmail     Boolean       @default(false)
+  sentByWhatsApp  Boolean       @default(false)
+  lastSentAt      DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  ticketType      TicketType    @relation(fields: [ticketTypeId], references: [id])
+  orderItem       OrderItem     @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id])
+  checkIns        CheckIn[]
+
+  @@index([ticketTypeId])
+  @@index([attendeeId])
+  @@index([qrCode])
+  @@index([ticketNumber])
+}
+
+model Checkpoint {
+  id              String          @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+  type            CheckpointType  @default(CUSTOM)
+
+  // Location
+  location        String?
+
+  // Access Control
+  allowedTicketTypes String[]     // Empty = all types allowed
+
+  isActive        Boolean         @default(true)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  event           Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  checkIns        CheckIn[]
+
+  @@index([eventId])
+}
+
+model CheckIn {
+  id              String        @id @default(cuid())
+  ticketId        String
+  attendeeId      String
+  checkpointId    String?
+
+  // Check-in details
+  checkedInAt     DateTime      @default(now())
+  checkedInBy     String?       // User ID who performed check-in
+  deviceId        String?       // Device used for check-in
+
+  // Location (for mobile check-in)
+  latitude        Float?
+  longitude       Float?
+
+  // Offline sync
+  isOfflineCheckIn Boolean      @default(false)
+  syncedAt        DateTime?
+
+  notes           String?
+
+  // Relations
+  ticket          Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+  checkpoint      Checkpoint?   @relation(fields: [checkpointId], references: [id])
+
+  @@index([ticketId])
+  @@index([attendeeId])
+  @@index([checkpointId])
+  @@index([checkedInAt])
+}
+
+model SessionCheckIn {
+  id              String        @id @default(cuid())
+  sessionId       String
+  attendeeId      String
+
+  checkedInAt     DateTime      @default(now())
+  checkedOutAt    DateTime?
+  checkedInBy     String?
+
+  // Relations
+  session         EventSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, attendeeId])
+  @@index([sessionId])
+  @@index([attendeeId])
+}
+
+// ==================== BADGES ====================
+
+model BadgeTemplate {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+
+  // Template design
+  width           Int           // mm
+  height          Int           // mm
+  orientation     String        @default("portrait") // portrait, landscape
+
+  // Design elements (JSON schema)
+  elements        Json          // Text, images, QR code positions, etc.
+
+  // Styling
+  backgroundColor String?
+  backgroundImageUrl String?
+
+  // Assignment
+  assignedTicketTypes String[]  // Ticket type IDs
+
+  isDefault       Boolean       @default(false)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+// ==================== COMMUNICATIONS ====================
+
+model EmailTemplate {
+  id              String        @id @default(cuid())
+  organizationId  String
+
+  name            String
+  slug            String        // confirmation, reminder, etc.
+  subject         String
+  htmlContent     String
+  textContent     String?
+
+  // Variables available
+  variables       String[]
+
+  isDefault       Boolean       @default(false)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+}
+
+model EmailCampaign {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  subject         String
+  htmlContent     String
+  textContent     String?
+
+  // Recipients
+  recipientFilter Json?         // Filter criteria
+  recipientCount  Int           @default(0)
+
+  // Scheduling
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+
+  // Stats
+  totalSent       Int           @default(0)
+  totalOpened     Int           @default(0)
+  totalClicked    Int           @default(0)
+  totalBounced    Int           @default(0)
+
+  status          String        @default("draft") // draft, scheduled, sending, sent
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+// ==================== VIRTUAL EVENTS ====================
+
+model ChatRoom {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  name            String
+  description     String?
+
+  type            String        @default("public") // public, session, private
+  sessionId       String?
+
+  isActive        Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  messages        ChatMessage[]
+
+  @@index([eventId])
+}
+
+model ChatMessage {
+  id              String        @id @default(cuid())
+  roomId          String
+  attendeeId      String
+
+  content         String
+
+  isDeleted       Boolean       @default(false)
+  deletedAt       DateTime?
+  deletedBy       String?
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  room            ChatRoom      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([attendeeId])
+  @@index([createdAt])
+}
+
+model LivePoll {
+  id              String        @id @default(cuid())
+  eventId         String
+  sessionId       String?
+
+  question        String
+  options         Json          // Array of option objects
+
+  // Settings
+  allowMultiple   Boolean       @default(false)
+  showResults     Boolean       @default(false)
+  isAnonymous     Boolean       @default(false)
+
+  // Status
+  isActive        Boolean       @default(false)
+  startedAt       DateTime?
+  endedAt         DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  session         EventSession? @relation(fields: [sessionId], references: [id])
+  responses       PollResponse[]
+
+  @@index([eventId])
+  @@index([sessionId])
+}
+
+model PollResponse {
+  id              String        @id @default(cuid())
+  pollId          String
+  attendeeId      String
+
+  selectedOptions Int[]         // Indices of selected options
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  poll            LivePoll      @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, attendeeId])
+  @@index([pollId])
+}
+
+model QnAQuestion {
+  id              String        @id @default(cuid())
+  sessionId       String
+
+  question        String
+  askerName       String?
+  askerEmail      String?
+
+  // Moderation
+  isApproved      Boolean       @default(false)
+  isAnswered      Boolean       @default(false)
+  answer          String?
+  answeredAt      DateTime?
+
+  // Engagement
+  upvotes         Int           @default(0)
+
+  isAnonymous     Boolean       @default(false)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  session         EventSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([isApproved])
+}
+
+// ==================== NETWORKING ====================
+
+model Meeting {
+  id              String        @id @default(cuid())
+  requesterId     String
+  receiverId      String
+
+  // Scheduling
+  proposedTimes   Json?         // Array of proposed time slots
+  confirmedTime   DateTime?
+  duration        Int           @default(30) // minutes
+
+  // Location
+  locationType    String        @default("in_person") // in_person, video
+  location        String?       // Room name or video URL
+  videoRoomUrl    String?
+
+  // Status
+  status          String        @default("pending") // pending, accepted, declined, cancelled
+
+  // Notes
+  requesterNote   String?
+  receiverNote    String?
+
+  confirmedAt     DateTime?
+  cancelledAt     DateTime?
+  cancelledBy     String?
+  cancelReason    String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  requester       Attendee      @relation("MeetingRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver        Attendee      @relation("MeetingReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([requesterId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+// ==================== LEAD CAPTURE ====================
+
+model Lead {
+  id              String        @id @default(cuid())
+  sponsorId       String
+  attendeeId      String
+
+  // Captured data
+  scannedAt       DateTime      @default(now())
+  scannedBy       String?       // Sponsor user who scanned
+
+  // Qualification
+  rating          Int?          // 1-5
+  notes           String?
+  tags            String[]
+
+  // Follow-up
+  isContacted     Boolean       @default(false)
+  contactedAt     DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  sponsor         Sponsor       @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  attendee        Attendee      @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  @@unique([sponsorId, attendeeId])
+  @@index([sponsorId])
+  @@index([attendeeId])
+}
+
+// ==================== SURVEYS ====================
+
+model Survey {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  title           String
+  description     String?
+
+  // Settings
+  isAnonymous     Boolean       @default(false)
+  isActive        Boolean       @default(true)
+
+  // Trigger
+  triggerType     String        @default("manual") // manual, post_event, post_session
+  triggerSessionId String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  questions       SurveyQuestion[]
+  responses       SurveyResponse[]
+
+  @@index([eventId])
+}
+
+model SurveyQuestion {
+  id              String        @id @default(cuid())
+  surveyId        String
+
+  question        String
+  type            String        // text, rating, single_choice, multiple_choice, scale
+  options         Json?         // For choice questions
+  isRequired      Boolean       @default(false)
+
+  sortOrder       Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  survey          Survey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers         SurveyAnswer[]
+
+  @@index([surveyId])
+}
+
+model SurveyResponse {
+  id              String        @id @default(cuid())
+  surveyId        String
+  attendeeId      String?       // null if anonymous
+
+  completedAt     DateTime      @default(now())
+
+  // Relations
+  survey          Survey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  attendee        Attendee?     @relation(fields: [attendeeId], references: [id])
+  answers         SurveyAnswer[]
+
+  @@index([surveyId])
+  @@index([attendeeId])
+}
+
+model SurveyAnswer {
+  id              String        @id @default(cuid())
+  responseId      String
+  questionId      String
+
+  value           String        // JSON string for complex answers
+
+  // Relations
+  response        SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question        SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([responseId])
+  @@index([questionId])
+}
+
+// ==================== WEBSITE ====================
+
+model WebsitePage {
+  id              String        @id @default(cuid())
+  eventId         String
+
+  title           String
+  slug            String
+
+  // Content (JSON blocks)
+  content         Json
+
+  // SEO
+  seoTitle        String?
+  seoDescription  String?
+
+  isPublished     Boolean       @default(false)
+  sortOrder       Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, slug])
+  @@index([eventId])
+}
+
+// ==================== API & INTEGRATIONS ====================
+
+model ApiKey {
+  id              String        @id @default(cuid())
+  organizationId  String
+
+  name            String
+  keyPrefix       String        // First 8 chars for identification
+  keyHash         String        // Hashed full key
+
+  // Permissions
+  scopes          String[]      // read:events, write:attendees, etc.
+
+  // Rate limiting
+  rateLimit       Int           @default(1000) // requests per hour
+
+  lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([keyPrefix])
+}
+
+model Webhook {
+  id              String        @id @default(cuid())
+  organizationId  String
+
+  name            String
+  url             String
+  secret          String        // For signature verification
+
+  // Events to subscribe
+  events          String[]      // attendee.created, order.completed, etc.
+
+  isActive        Boolean       @default(true)
+
+  // Stats
+  lastTriggeredAt DateTime?
+  failureCount    Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries      WebhookDelivery[]
+
+  @@index([organizationId])
+}
+
+model WebhookDelivery {
+  id              String        @id @default(cuid())
+  webhookId       String
+
+  event           String
+  payload         Json
+
+  // Response
+  statusCode      Int?
+  responseBody    String?
+  responseTime    Int?          // ms
+
+  // Retry
+  attempt         Int           @default(1)
+  nextRetryAt     DateTime?
+
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  webhook         Webhook       @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([createdAt])
+}
+
+// ==================== AUDIT LOGS ====================
+
+model AuditLog {
+  id              String        @id @default(cuid())
+  organizationId  String
+  userId          String?
+
+  action          String        // create, update, delete, login, etc.
+  entityType      String        // event, attendee, order, etc.
+  entityId        String?
+
+  // Changes
+  oldValues       Json?
+  newValues       Json?
+
+  // Context
+  ipAddress       String?
+  userAgent       String?
+
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?         @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

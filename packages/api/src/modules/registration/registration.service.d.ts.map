@@ -1,0 +1,1 @@
+{"version":3,"file":"registration.service.d.ts","sourceRoot":"","sources":["registration.service.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,MAAM,oCAAoC,CAAC;AAEnE,qBACa,mBAAmB;IAClB,OAAO,CAAC,QAAQ,CAAC,MAAM;gBAAN,MAAM,EAAE,aAAa;IAG5C,QAAQ,CAAC,OAAO,EAAE,MAAM,EAAE,IAAI,EAAE,GAAG;;;CAI1C"}

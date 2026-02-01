@@ -1,0 +1,42 @@
+{
+  "name": "@event-platform/database",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx src/seed.ts",
+    "studio": "prisma studio",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "bcrypt": "^5.1.1"
+  },
+  "devDependencies": {
+    "@event-platform/typescript-config": "workspace:*",
+    "@types/bcrypt": "^5.0.2",
+    "prisma": "^5.15.0",
+    "tsup": "^8.0.2",
+    "tsx": "^4.10.0",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,40 @@
+// Export Prisma client and types
+export * from '@prisma/client';
+export { prisma, PrismaClient } from './client';
+
+// Re-export useful types
+export type {
+  Organization,
+  OrganizationMember,
+  User,
+  Event,
+  EventSession,
+  Speaker,
+  Sponsor,
+  TicketType,
+  Attendee,
+  Order,
+  OrderItem,
+  Payment,
+  Ticket,
+  Checkpoint,
+  CheckIn,
+  Coupon,
+  BadgeTemplate,
+  RegistrationForm,
+  FormField,
+  EmailTemplate,
+  EmailCampaign,
+  ChatRoom,
+  ChatMessage,
+  LivePoll,
+  PollResponse,
+  Meeting,
+  Lead,
+  Survey,
+  SurveyQuestion,
+  SurveyResponse,
+  ApiKey,
+  Webhook,
+  AuditLog,
+} from '@prisma/client';
