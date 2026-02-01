@@ -107,12 +107,12 @@ export default function Home() {
               {[
                 {
                   name: 'Standard',
-                  price: 'R275,000',
+                  price: 'R75,000',
                   period: '/year',
                   slug: 'standard',
                   features: [
-                    'Unlimited internal events',
-                    'Up to 1,000 attendees/event',
+                    'Up to 12 events/year',
+                    'Up to 500 attendees/event',
                     'Registration & check-in',
                     'Basic analytics',
                     'Email support',
@@ -120,13 +120,13 @@ export default function Home() {
                 },
                 {
                   name: 'Professional',
-                  price: 'R735,000',
+                  price: 'R195,000',
                   period: '/year',
                   slug: 'professional',
                   popular: true,
                   features: [
-                    'Everything in Standard',
-                    'Up to 5,000 attendees/event',
+                    'Unlimited events',
+                    'Up to 2,500 attendees/event',
                     'Virtual events',
                     'Advanced analytics',
                     'Custom branding',
@@ -142,8 +142,8 @@ export default function Home() {
                     'Everything in Professional',
                     'Unlimited attendees',
                     'SSO integration',
-                    'Dedicated support',
-                    'Custom development',
+                    'Dedicated account manager',
+                    'Custom integrations',
                     'SLA guarantee',
                   ],
                 },
