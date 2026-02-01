@@ -2,7 +2,7 @@
 # Stage 1: Base with pnpm
 FROM node:20-alpine AS base
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 
 WORKDIR /app
 
@@ -43,20 +43,11 @@ RUN pnpm run build
 WORKDIR /app/packages/api
 RUN pnpm run build
 
-# Deploy API with all dependencies (resolves pnpm symlinks)
-WORKDIR /app
-RUN pnpm deploy --filter=@event-platform/api --prod /app/deploy
-
-# Copy Prisma schema and regenerate client in deploy directory
-COPY packages/database/prisma /app/deploy/prisma
-WORKDIR /app/deploy
-RUN npx prisma generate --schema=./prisma/schema.prisma
-
 # Stage 3: Production
 FROM node:20-alpine AS runner
 
-# Install security updates
-RUN apk add --no-cache libc6-compat && apk upgrade
+# Install build tools for native modules (bcrypt, sharp)
+RUN apk add --no-cache libc6-compat python3 make g++ && apk upgrade
 
 WORKDIR /app
 
@@ -64,11 +55,33 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
-# Copy deployed application (includes node_modules without symlinks)
-COPY --from=builder --chown=nestjs:nodejs /app/deploy ./
+# Copy built application
+COPY --from=builder /app/packages/api/dist ./dist
+COPY --from=builder /app/packages/api/package.json ./package.json
 
-# Copy Prisma schema for migrations
-COPY --from=builder --chown=nestjs:nodejs /app/packages/database/prisma ./prisma
+# Copy built workspace packages that API depends on
+COPY --from=builder /app/packages/database/dist ./node_modules/@event-platform/database/dist
+COPY --from=builder /app/packages/database/package.json ./node_modules/@event-platform/database/package.json
+COPY --from=builder /app/packages/shared/dist ./node_modules/@event-platform/shared/dist
+COPY --from=builder /app/packages/shared/package.json ./node_modules/@event-platform/shared/package.json
+
+# Copy Prisma schema
+COPY --from=builder /app/packages/database/prisma ./prisma
+
+# Install production dependencies with npm (avoids pnpm symlink issues)
+RUN npm install --omit=dev --ignore-scripts
+
+# Generate Prisma client
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+# Rebuild native modules
+RUN npm rebuild bcrypt sharp || true
+
+# Clean up build tools
+RUN apk del python3 make g++
+
+# Set ownership
+RUN chown -R nestjs:nodejs /app
 
 USER nestjs
 
