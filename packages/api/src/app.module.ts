@@ -28,7 +28,11 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
+// Controllers
+import { HealthController } from './health.controller';
+
 @Module({
+  controllers: [HealthController],
   imports: [
     // Configuration
     ConfigModule.forRoot({
