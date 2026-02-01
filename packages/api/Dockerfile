@@ -47,8 +47,10 @@ RUN pnpm run build
 WORKDIR /app
 RUN pnpm deploy --filter=@event-platform/api --prod /app/deploy
 
-# Copy Prisma client to deploy directory
-RUN cp -r /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma /app/deploy/node_modules/.prisma
+# Copy Prisma schema and regenerate client in deploy directory
+COPY packages/database/prisma /app/deploy/prisma
+WORKDIR /app/deploy
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Stage 3: Production
 FROM node:20-alpine AS runner
