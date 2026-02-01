@@ -68,6 +68,10 @@ COPY --from=builder /app/packages/shared/package.json ./node_modules/@event-plat
 # Copy Prisma schema
 COPY --from=builder /app/packages/database/prisma ./prisma
 
+# Remove workspace references from package.json (npm doesn't understand them)
+# We copy these packages manually above
+RUN sed -i '/"@event-platform\/database"/d; /"@event-platform\/shared"/d' package.json
+
 # Install production dependencies with npm (avoids pnpm symlink issues)
 RUN npm install --omit=dev --ignore-scripts
 
