@@ -72,7 +72,6 @@ COPY --from=builder --chown=nestjs:nodejs /app/packages/api/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/packages/api/package.json ./package.json
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/packages/api/node_modules ./packages/api/node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/packages/database/node_modules/.prisma ./node_modules/.prisma
 
 # Copy Prisma schema for migrations
 COPY --from=builder --chown=nestjs:nodejs /app/packages/database/prisma ./prisma
