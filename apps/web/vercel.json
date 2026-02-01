@@ -1,11 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "buildCommand": "cd ../.. && pnpm --filter @event-platform/web build",
-  "installCommand": "cd ../.. && pnpm install",
-  "outputDirectory": ".next",
-  "devCommand": "pnpm dev",
-  "regions": ["iad1"],
   "headers": [
     {
       "source": "/api/:path*",
@@ -15,12 +9,6 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
         { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/v1/:path*",
-      "destination": "${NEXT_PUBLIC_API_URL}/api/v1/:path*"
     }
   ]
 }
