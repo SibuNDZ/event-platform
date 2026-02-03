@@ -29,19 +29,13 @@ let isRefreshing = false;
 let refreshPromise: Promise<boolean> | null = null;
 
 async function refreshAccessToken(): Promise<boolean> {
-  const { tokens, setTokens, clearAuth } = useAuthStore.getState();
-
-  if (!tokens?.refreshToken) {
-    return false;
-  }
+  const { clearAuth } = useAuthStore.getState();
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -49,14 +43,6 @@ async function refreshAccessToken(): Promise<boolean> {
       return false;
     }
 
-    const json = await response.json();
-    const data = json.data || json;
-    const apiTokens = data.tokens;
-    setTokens({
-      accessToken: apiTokens.accessToken,
-      refreshToken: apiTokens.refreshToken,
-      expiresAt: Date.now() + apiTokens.expiresIn * 1000,
-    });
     return true;
   } catch {
     clearAuth();
@@ -83,35 +69,27 @@ export async function apiClient<T>(
   options: RequestOptions = {}
 ): Promise<T> {
   const { body, skipAuth, ...fetchOptions } = options;
-  const { tokens } = useAuthStore.getState();
+  const { isAuthenticated } = useAuthStore.getState();
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...fetchOptions.headers,
   };
 
-  if (!skipAuth && tokens?.accessToken) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${tokens.accessToken}`;
-  }
-
   const config: RequestInit = {
     ...fetchOptions,
     headers,
+    credentials: 'include',
     body: body ? JSON.stringify(body) : undefined,
   };
 
   let response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-  if (response.status === 401 && !skipAuth && tokens?.refreshToken) {
+  if (response.status === 401 && !skipAuth && isAuthenticated) {
     const refreshed = await handleTokenRefresh();
 
     if (refreshed) {
-      const newTokens = useAuthStore.getState().tokens;
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${newTokens?.accessToken}`;
-      response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...config,
-        headers,
-      });
+      response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     }
   }
 

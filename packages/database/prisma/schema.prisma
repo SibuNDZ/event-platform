@@ -1465,3 +1465,32 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([createdAt])
 }
+
+// ==================== MARKETING ====================
+
+model DemoLead {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  company     String
+  phone       String?
+  eventSize   String?
+  message     String?
+
+  source      String?  // web, partner, campaign
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  ipAddress   String?
+  userAgent   String?
+
+  status      String   @default("new")
+  createdAt   DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}

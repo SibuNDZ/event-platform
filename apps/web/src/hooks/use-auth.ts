@@ -2,27 +2,19 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useAuthStore, AuthTokens } from '@/stores/auth-store';
-import { authApi, LoginRequest, RegisterRequest, ApiTokens } from '@/lib/api/auth';
+import { useAuthStore } from '@/stores/auth-store';
+import { authApi, LoginRequest, RegisterRequest } from '@/lib/api/auth';
 import { ApiClientError } from '@/lib/api/client';
-
-function convertTokens(apiTokens: ApiTokens): AuthTokens {
-  return {
-    accessToken: apiTokens.accessToken,
-    refreshToken: apiTokens.refreshToken,
-    expiresAt: Date.now() + apiTokens.expiresIn * 1000,
-  };
-}
 
 export function useAuth() {
   const router = useRouter();
-  const { user, organization, tokens, isAuthenticated, isHydrated, setAuth, clearAuth } =
+  const { user, organization, isAuthenticated, isHydrated, setAuth, clearAuth } =
     useAuthStore();
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (response) => {
-      setAuth(response.user, response.organization, convertTokens(response.tokens));
+      setAuth(response.user, response.organization);
       router.push('/dashboard');
     },
   });
@@ -30,19 +22,17 @@ export function useAuth() {
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
     onSuccess: (response) => {
-      setAuth(response.user, response.organization, convertTokens(response.tokens));
+      setAuth(response.user, response.organization);
       router.push('/dashboard');
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      if (tokens?.refreshToken) {
-        try {
-          await authApi.logout(tokens.refreshToken);
-        } catch {
-          // Ignore logout errors - still clear local state
-        }
+      try {
+        await authApi.logout();
+      } catch {
+        // Ignore logout errors - still clear local state
       }
     },
     onSettled: () => {

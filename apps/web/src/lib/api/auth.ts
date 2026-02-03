@@ -15,20 +15,14 @@ export interface RegisterRequest {
   organizationName?: string;
 }
 
-export interface ApiTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-}
-
 export interface AuthResponse {
   user: CurrentUser;
   organization: Organization | null;
-  tokens: ApiTokens;
+  expiresIn?: number;
 }
 
 export interface RefreshResponse {
-  tokens: ApiTokens;
+  expiresIn?: number;
 }
 
 export interface MeResponse {
@@ -50,12 +44,15 @@ export const authApi = {
   register: (data: RegisterRequest) =>
     api.post<AuthResponse>('/auth/register', data, { skipAuth: true }),
 
-  refresh: (refreshToken: string) =>
-    api.post<RefreshResponse>('/auth/refresh', { refreshToken }, { skipAuth: true }),
+  refresh: () =>
+    api.post<RefreshResponse>('/auth/refresh', undefined, { skipAuth: true }),
 
-  logout: (refreshToken: string) =>
-    api.post<{ message: string }>('/auth/logout', { refreshToken }),
+  logout: () =>
+    api.post<{ message: string }>('/auth/logout'),
 
   getMe: () =>
     api.get<MeResponse>('/auth/me'),
+
+  getOrganizations: () =>
+    api.get<Organization[]>('/auth/organizations'),
 };

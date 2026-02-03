@@ -38,11 +38,16 @@ export default function DemoPage() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex flex-col">
-        <header className="border-b">
+        <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg" />
-              <span className="text-xl font-bold">EventPlatform</span>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary shadow-lg shadow-primary/20" />
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  Event Platform
+                </p>
+                <p className="text-lg font-semibold">Operations Suite</p>
+              </div>
             </Link>
           </div>
         </header>
@@ -69,18 +74,23 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b">
+      <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg" />
-            <span className="text-xl font-bold">EventPlatform</span>
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary shadow-lg shadow-primary/20" />
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Event Platform
+              </p>
+              <p className="text-lg font-semibold">Operations Suite</p>
+            </div>
           </Link>
-          <nav className="flex items-center space-x-4">
+          <nav className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost">Login</Button>
             </Link>
             <Link href="/register">
-              <Button>Get Started</Button>
+              <Button className="shadow-lg shadow-primary/25">Get Started</Button>
             </Link>
           </nav>
         </div>
@@ -135,11 +145,11 @@ export default function DemoPage() {
               </div>
 
               <div className="mt-12 p-6 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">Trusted by leading organizations</p>
-                <div className="flex items-center space-x-6 text-muted-foreground">
-                  <span className="font-semibold">500+ Events</span>
-                  <span className="font-semibold">100K+ Attendees</span>
-                  <span className="font-semibold">50+ Companies</span>
+                <p className="text-sm text-muted-foreground mb-2">Built for teams running</p>
+                <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
+                  <span className="font-semibold">Conferences</span>
+                  <span className="font-semibold">Corporate summits</span>
+                  <span className="font-semibold">Training programs</span>
                 </div>
               </div>
             </div>
@@ -281,7 +291,7 @@ export default function DemoPage() {
 
       <footer className="border-t py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2025 Event Platform. All rights reserved.</p>
+          <p>&copy; 2026 Event Platform. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -26,6 +26,7 @@ import { CommunicationsModule } from './modules/communications/communications.mo
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { MarketingModule } from './modules/marketing/marketing.module';
 
 // Interceptors
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -84,6 +85,7 @@ import { HealthController } from './health.controller';
     AnalyticsModule,
     WebhooksModule,
     IntegrationsModule,
+    MarketingModule,
   ],
   providers: [
     {

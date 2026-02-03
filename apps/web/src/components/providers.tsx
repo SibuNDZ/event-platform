@@ -2,48 +2,31 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Toaster } from '@/components/ui/toaster';
-import { useAuthStore, AuthTokens } from '@/stores/auth-store';
-import { authApi, ApiTokens } from '@/lib/api/auth';
-
-function convertTokens(apiTokens: ApiTokens): AuthTokens {
-  return {
-    accessToken: apiTokens.accessToken,
-    refreshToken: apiTokens.refreshToken,
-    expiresAt: Date.now() + apiTokens.expiresIn * 1000,
-  };
-}
+import { useAuthStore } from '@/stores/auth-store';
+import { authApi } from '@/lib/api/auth';
 
 function AuthRefreshTimer() {
-  const { tokens, setTokens, clearAuth, isAuthenticated } = useAuthStore();
+  const { clearAuth, isAuthenticated } = useAuthStore();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
-    if (!isAuthenticated || !tokens) return;
+    if (!isAuthenticated) return;
 
-    const checkAndRefresh = async () => {
-      const now = Date.now();
-      const expiresAt = tokens.expiresAt;
-      const bufferMs = 60 * 1000; // Refresh 1 minute before expiry
-
-      if (expiresAt - now < bufferMs) {
-        try {
-          const response = await authApi.refresh(tokens.refreshToken);
-          setTokens(convertTokens(response.tokens));
-        } catch {
-          clearAuth();
-        }
+    const refreshToken = async () => {
+      try {
+        await authApi.refresh();
+      } catch {
+        clearAuth();
       }
     };
 
-    // Check immediately on mount
-    checkAndRefresh();
+    // Refresh every 12 minutes (tokens expire in 15m by default)
+    intervalRef.current = setInterval(refreshToken, 12 * 60 * 1000);
 
-    // Then check every 30 seconds
-    const interval = setInterval(checkAndRefresh, 30 * 1000);
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, tokens, setTokens, clearAuth]);
+    return () => clearInterval(intervalRef.current);
+  }, [isAuthenticated, clearAuth]);
 
   return null;
 }

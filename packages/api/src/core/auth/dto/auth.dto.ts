@@ -45,9 +45,9 @@ export class RegisterDto {
 
 export class RefreshTokenDto {
   @ApiProperty()
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 export class SwitchOrganizationDto {

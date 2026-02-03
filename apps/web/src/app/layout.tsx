@@ -1,13 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Grotesk, Fraunces } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const sans = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+const display = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-display',
+});
 
 export const metadata: Metadata = {
-  title: 'Event Platform - Manage Your Events',
-  description: 'Enterprise event management platform for conferences, summits, and corporate events',
+  title: 'Event Platform - Modern Event Operations',
+  description:
+    'A modern event platform for registration, ticketing, check-in, and analytics at scale.',
 };
 
 export default function RootLayout({
@@ -17,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${sans.variable} ${display.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

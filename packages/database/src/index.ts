@@ -37,4 +37,5 @@ export type {
   ApiKey,
   Webhook,
   AuditLog,
+  DemoLead,
 } from '@prisma/client';

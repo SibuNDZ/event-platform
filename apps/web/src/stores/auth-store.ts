@@ -16,23 +16,16 @@ export interface Organization {
   licenseTier?: string;
 }
 
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: number;
-}
-
 interface AuthState {
   user: CurrentUser | null;
   organization: Organization | null;
-  tokens: AuthTokens | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
 }
 
 interface AuthActions {
-  setAuth: (user: CurrentUser, organization: Organization | null, tokens: AuthTokens) => void;
-  setTokens: (tokens: AuthTokens) => void;
+  setAuth: (user: CurrentUser, organization: Organization | null) => void;
+  setOrganization: (organization: Organization | null) => void;
   clearAuth: () => void;
   setHydrated: (hydrated: boolean) => void;
 }
@@ -44,28 +37,25 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       user: null,
       organization: null,
-      tokens: null,
       isAuthenticated: false,
       isHydrated: false,
 
-      setAuth: (user, organization, tokens) =>
+      setAuth: (user, organization) =>
         set({
           user,
           organization,
-          tokens,
           isAuthenticated: true,
         }),
 
-      setTokens: (tokens) =>
+      setOrganization: (organization) =>
         set({
-          tokens,
+          organization,
         }),
 
       clearAuth: () =>
         set({
           user: null,
           organization: null,
-          tokens: null,
           isAuthenticated: false,
         }),
 
@@ -79,12 +69,8 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         organization: state.organization,
-        tokens: state.tokens,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHydrated(true);
-      },
     }
   )
 );
