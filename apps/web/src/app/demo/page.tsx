@@ -44,7 +44,7 @@ export default function DemoPage() {
               <div className="w-10 h-10 rounded-2xl bg-primary shadow-lg shadow-primary/20" />
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  Event Platform
+                  Vibrant Events
                 </p>
                 <p className="text-lg font-semibold">Operations Suite</p>
               </div>
@@ -80,7 +80,7 @@ export default function DemoPage() {
             <div className="w-10 h-10 rounded-2xl bg-primary shadow-lg shadow-primary/20" />
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Event Platform
+                Vibrant Events
               </p>
               <p className="text-lg font-semibold">Operations Suite</p>
             </div>
@@ -291,7 +291,7 @@ export default function DemoPage() {
 
       <footer className="border-t py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 Event Platform. All rights reserved.</p>
+          <p>&copy; 2026 Vibrant Events. All rights reserved.</p>
         </div>
       </footer>
     </div>

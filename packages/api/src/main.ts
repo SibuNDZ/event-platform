@@ -35,6 +35,8 @@ async function bootstrap() {
       if (allowedOrigins.includes(origin)) return callback(null, true);
       // Allow all Vercel preview deployments
       if (origin.endsWith('.vercel.app')) return callback(null, true);
+      // Allow custom domain
+      if (origin.endsWith('.vibrant-events.co.za') || origin === 'https://vibrant-events.co.za') return callback(null, true);
       // Allow localhost in development
       if (origin.startsWith('http://localhost:')) return callback(null, true);
       callback(null, false);

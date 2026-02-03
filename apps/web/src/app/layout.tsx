@@ -13,9 +13,9 @@ const display = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: 'Event Platform - Modern Event Operations',
+  title: 'Vibrant Events - Modern Event Operations',
   description:
-    'A modern event platform for registration, ticketing, check-in, and analytics at scale.',
+    'South Africa\'s modern event platform for registration, ticketing, check-in, and analytics at scale.',
 };
 
 export default function RootLayout({

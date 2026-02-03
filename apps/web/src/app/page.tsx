@@ -53,7 +53,7 @@ export default function Home() {
   const plans = [
     {
       name: 'Standard',
-      price: '$9,600',
+      price: 'R75,000',
       period: '/year',
       slug: 'standard',
       features: [
@@ -66,7 +66,7 @@ export default function Home() {
     },
     {
       name: 'Professional',
-      price: '$24,000',
+      price: 'R195,000',
       period: '/year',
       slug: 'professional',
       popular: true,
@@ -104,7 +104,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-2xl bg-primary shadow-lg shadow-primary/20" />
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Event Platform
+                Vibrant Events
               </p>
               <p className="text-lg font-semibold">Operations Suite</p>
             </div>
@@ -137,7 +137,7 @@ export default function Home() {
                   Event operations that feel effortless — even at enterprise scale.
                 </h1>
                 <p className="mt-6 text-lg text-muted-foreground text-balance">
-                  Event Platform brings registration, payments, communications, and on-site
+                  Vibrant Events brings registration, payments, communications, and on-site
                   execution into a single, real-time system built for modern teams.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -172,7 +172,7 @@ export default function Home() {
                     { label: 'Registrations', value: '4,280' },
                     { label: 'Check-ins', value: '3,912' },
                     { label: 'Conversion', value: '78.4%' },
-                    { label: 'Revenue', value: '$482k' },
+                    { label: 'Revenue', value: 'R8.7M' },
                   ].map((stat) => (
                     <div
                       key={stat.label}
@@ -325,7 +325,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 Event Platform. All rights reserved.</p>
+          <p>&copy; 2026 Vibrant Events. All rights reserved.</p>
         </div>
       </footer>
     </div>
