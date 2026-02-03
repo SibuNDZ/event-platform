@@ -10,7 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthService, RegisterDto } from './auth.service';
+import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
 import {
   LoginDto,
+  RegisterDto,
   RefreshTokenDto,
   SwitchOrganizationDto,
   ChangePasswordDto,
