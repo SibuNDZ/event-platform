@@ -23,10 +23,22 @@ async function bootstrap() {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
+  const allowedOrigins = corsOrigins.length
+    ? corsOrigins
+    : [configService.get<string>('FRONTEND_URL', 'http://localhost:3000')];
+
   app.enableCors({
-    origin: corsOrigins.length
-      ? corsOrigins
-      : [configService.get<string>('FRONTEND_URL', 'http://localhost:3000')],
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests with no origin (server-to-server, health checks)
+      if (!origin) return callback(null, true);
+      // Allow exact matches from CORS_ORIGINS
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow all Vercel preview deployments
+      if (origin.endsWith('.vercel.app')) return callback(null, true);
+      // Allow localhost in development
+      if (origin.startsWith('http://localhost:')) return callback(null, true);
+      callback(null, false);
+    },
     credentials: true,
   });
 
