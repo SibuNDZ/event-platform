@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { CacheService } from './cache.service';
@@ -12,14 +12,31 @@ export { REDIS_CLIENT };
     {
       provide: REDIS_CLIENT,
       useFactory: (configService: ConfigService) => {
-        const redisUrl = configService.get<string>('REDIS_URL', 'redis://localhost:6379');
-        return new Redis(redisUrl, {
+        const logger = new Logger('CacheModule');
+        const redisUrl = configService.get<string>('REDIS_URL');
+
+        if (!redisUrl) {
+          logger.warn('REDIS_URL not set — cache will use in-memory fallback');
+          return null;
+        }
+
+        const client = new Redis(redisUrl, {
           maxRetriesPerRequest: 3,
           retryStrategy(times) {
-            const delay = Math.min(times * 50, 2000);
-            return delay;
+            if (times > 5) {
+              logger.error('Redis connection failed after 5 retries, giving up');
+              return null;
+            }
+            return Math.min(times * 50, 2000);
           },
+          lazyConnect: true,
         });
+
+        client.connect().catch((err) => {
+          logger.error(`Redis connection error: ${err.message}`);
+        });
+
+        return client;
       },
       inject: [ConfigService],
     },

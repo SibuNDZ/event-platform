@@ -27,11 +27,19 @@ export class QueueService implements OnModuleDestroy {
   private readonly logger = new Logger(QueueService.name);
   private queues: Map<string, Queue> = new Map();
   private workers: Map<string, Worker> = new Map();
+  private readonly enabled: boolean;
 
   constructor(
     @Inject(QUEUE_CONNECTION)
-    private readonly connection: ConnectionOptions,
+    private readonly connection: ConnectionOptions | null,
   ) {
+    this.enabled = connection !== null;
+
+    if (!this.enabled) {
+      this.logger.warn('Queue service disabled (no Redis connection)');
+      return;
+    }
+
     // Initialize queues
     Object.values(QUEUES).forEach((queueName) => {
       this.getQueue(queueName);
@@ -39,6 +47,9 @@ export class QueueService implements OnModuleDestroy {
   }
 
   getQueue(name: string): Queue {
+    if (!this.enabled || !this.connection) {
+      return null as unknown as Queue;
+    }
     if (!this.queues.has(name)) {
       const queue = new Queue(name, { connection: this.connection });
       this.queues.set(name, queue);
@@ -49,7 +60,11 @@ export class QueueService implements OnModuleDestroy {
   async addJob<T extends JobData>(
     queueName: string,
     job: QueueJob<T>,
-  ): Promise<Job<T>> {
+  ): Promise<Job<T> | null> {
+    if (!this.enabled) {
+      this.logger.warn(`Job ${job.name} dropped — queue ${queueName} disabled (no Redis)`);
+      return null;
+    }
     const queue = this.getQueue(queueName);
     return queue.add(job.name, job.data, {
       attempts: 3,
@@ -67,6 +82,10 @@ export class QueueService implements OnModuleDestroy {
     queueName: string,
     jobs: QueueJob<T>[],
   ): Promise<Job<T>[]> {
+    if (!this.enabled) {
+      this.logger.warn(`${jobs.length} jobs dropped — queue ${queueName} disabled (no Redis)`);
+      return [];
+    }
     const queue = this.getQueue(queueName);
     return queue.addBulk(
       jobs.map((job) => ({
@@ -90,7 +109,12 @@ export class QueueService implements OnModuleDestroy {
     queueName: string,
     processor: (job: Job<T>) => Promise<unknown>,
     concurrency = 5,
-  ): Worker<T> {
+  ): Worker<T> | null {
+    if (!this.enabled || !this.connection) {
+      this.logger.warn(`Worker for queue ${queueName} not registered (no Redis)`);
+      return null;
+    }
+
     if (this.workers.has(queueName)) {
       return this.workers.get(queueName) as Worker<T>;
     }
@@ -120,16 +144,19 @@ export class QueueService implements OnModuleDestroy {
   }
 
   async getJobCounts(queueName: string) {
+    if (!this.enabled) return { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0 };
     const queue = this.getQueue(queueName);
     return queue.getJobCounts();
   }
 
   async pauseQueue(queueName: string): Promise<void> {
+    if (!this.enabled) return;
     const queue = this.getQueue(queueName);
     await queue.pause();
   }
 
   async resumeQueue(queueName: string): Promise<void> {
+    if (!this.enabled) return;
     const queue = this.getQueue(queueName);
     await queue.resume();
   }
@@ -140,6 +167,7 @@ export class QueueService implements OnModuleDestroy {
     limit: number = 0,
     type: 'completed' | 'wait' | 'active' | 'delayed' | 'failed' = 'completed',
   ): Promise<string[]> {
+    if (!this.enabled) return [];
     const queue = this.getQueue(queueName);
     return queue.clean(grace, limit, type);
   }

@@ -19,13 +19,17 @@ export class WebhooksProcessor implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.queueService.registerWorker(
+    const worker = this.queueService.registerWorker(
       QUEUES.WEBHOOK,
       this.processDelivery.bind(this) as (job: Job) => Promise<unknown>,
       3, // concurrency
     );
 
-    this.logger.log('Webhook delivery processor initialized');
+    if (worker) {
+      this.logger.log('Webhook delivery processor initialized');
+    } else {
+      this.logger.warn('Webhook delivery processor skipped (no Redis)');
+    }
   }
 
   private async processDelivery(job: Job<WebhookDeliveryJob>): Promise<void> {
