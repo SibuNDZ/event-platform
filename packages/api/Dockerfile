@@ -87,10 +87,11 @@ RUN node -e " \
 RUN npm install --omit=dev --ignore-scripts
 
 # Install dependencies for workspace packages we copied manually
-RUN npm install nanoid@5 zod@3 @prisma/client@5.22.0 --ignore-scripts
+# Include prisma CLI so db push works at runtime (startup schema sync)
+RUN npm install nanoid@5 zod@3 @prisma/client@5.22.0 prisma@5.22.0 --ignore-scripts
 
-# Generate Prisma client (pin to v5 to match schema)
-RUN npx prisma@5.22.0 generate --schema=./prisma/schema.prisma
+# Generate Prisma client
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Rebuild native modules
 RUN npm rebuild bcrypt sharp || true
