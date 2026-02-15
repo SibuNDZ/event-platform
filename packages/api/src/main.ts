@@ -8,7 +8,11 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  console.log('Starting application bootstrap...');
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
+  console.log('Nest application created.');
   const configService = app.get(ConfigService);
 
   // Security
