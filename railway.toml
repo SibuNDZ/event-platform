@@ -3,7 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "packages/api/Dockerfile"
 
 [deploy]
-startCommand = "npx prisma db push --schema=./prisma/schema.prisma --skip-generate && node dist/main.js"
+preDeployCommand = "npx prisma db push --schema=./prisma/schema.prisma --skip-generate"
+startCommand = "node dist/main.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"

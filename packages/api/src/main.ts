@@ -92,10 +92,19 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document);
   }
 
-  const port = configService.get<number>('PORT') || configService.get<number>('API_PORT', 4000);
-  await app.listen(port, '0.0.0.0');
-  console.log(`Application is running on: http://0.0.0.0:${port}`);
-  console.log(`Swagger documentation: http://0.0.0.0:${port}/docs`);
+  const portRaw = configService.get<string>('PORT');
+  const apiPortRaw = configService.get<string>('API_PORT');
+  const port = Number.parseInt(portRaw ?? '', 10);
+  const apiPort = Number.parseInt(apiPortRaw ?? '', 10);
+  const resolvedPort = Number.isFinite(port)
+    ? port
+    : Number.isFinite(apiPort)
+      ? apiPort
+      : 4000;
+
+  await app.listen(resolvedPort, '0.0.0.0');
+  console.log(`Application is running on: http://0.0.0.0:${resolvedPort}`);
+  console.log(`Swagger documentation: http://0.0.0.0:${resolvedPort}/docs`);
 }
 
 bootstrap();

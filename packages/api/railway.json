@@ -3,10 +3,14 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "packages/api/Dockerfile",
-    "watchPatterns": ["packages/api/**", "packages/database/**", "packages/shared/**"]
+    "watchPatterns": [
+      "packages/api/**",
+      "packages/database/**",
+      "packages/shared/**"
+    ]
   },
   "deploy": {
-    "startCommand": "node dist/main.js",
+    "startCommand": "npm run start:prod:migrate",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
