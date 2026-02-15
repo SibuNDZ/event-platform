@@ -27,7 +27,7 @@ interface DashboardResponse {
 export class AnalyticsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async getDashboard(eventId: string): Promise<DashboardResponse> {
@@ -113,7 +113,7 @@ export class AnalyticsService {
     }));
   }
 
-  async exportAttendees(eventId: string, format: 'csv' | 'xlsx' = 'csv') {
+  async exportAttendees(eventId: string, _format: 'csv' | 'xlsx' = 'csv') {
     await this.verifyEventAccess(eventId);
 
     const attendees = await this.prisma.attendee.findMany({

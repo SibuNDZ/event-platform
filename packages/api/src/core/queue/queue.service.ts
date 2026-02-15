@@ -31,7 +31,7 @@ export class QueueService implements OnModuleDestroy {
 
   constructor(
     @Inject(QUEUE_CONNECTION)
-    private readonly connection: ConnectionOptions | null,
+    private readonly connection: ConnectionOptions | null
   ) {
     this.enabled = connection !== null;
 
@@ -57,10 +57,7 @@ export class QueueService implements OnModuleDestroy {
     return this.queues.get(name)!;
   }
 
-  async addJob<T extends JobData>(
-    queueName: string,
-    job: QueueJob<T>,
-  ): Promise<Job<T> | null> {
+  async addJob<T extends JobData>(queueName: string, job: QueueJob<T>): Promise<Job<T> | null> {
     if (!this.enabled) {
       this.logger.warn(`Job ${job.name} dropped — queue ${queueName} disabled (no Redis)`);
       return null;
@@ -78,10 +75,7 @@ export class QueueService implements OnModuleDestroy {
     });
   }
 
-  async addBulk<T extends JobData>(
-    queueName: string,
-    jobs: QueueJob<T>[],
-  ): Promise<Job<T>[]> {
+  async addBulk<T extends JobData>(queueName: string, jobs: QueueJob<T>[]): Promise<Job<T>[]> {
     if (!this.enabled) {
       this.logger.warn(`${jobs.length} jobs dropped — queue ${queueName} disabled (no Redis)`);
       return [];
@@ -101,14 +95,14 @@ export class QueueService implements OnModuleDestroy {
           removeOnFail: 1000,
           ...job.opts,
         },
-      })),
+      }))
     );
   }
 
   registerWorker<T extends JobData>(
     queueName: string,
     processor: (job: Job<T>) => Promise<unknown>,
-    concurrency = 5,
+    concurrency = 5
   ): Worker<T> | null {
     if (!this.enabled || !this.connection) {
       this.logger.warn(`Worker for queue ${queueName} not registered (no Redis)`);
@@ -129,10 +123,7 @@ export class QueueService implements OnModuleDestroy {
     });
 
     worker.on('failed', (job, err) => {
-      this.logger.error(
-        `Job ${job?.id} failed in queue ${queueName}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Job ${job?.id} failed in queue ${queueName}: ${err.message}`, err.stack);
     });
 
     worker.on('error', (err) => {
@@ -165,7 +156,7 @@ export class QueueService implements OnModuleDestroy {
     queueName: string,
     grace: number = 0,
     limit: number = 0,
-    type: 'completed' | 'wait' | 'active' | 'delayed' | 'failed' = 'completed',
+    type: 'completed' | 'wait' | 'active' | 'delayed' | 'failed' = 'completed'
   ): Promise<string[]> {
     if (!this.enabled) return [];
     const queue = this.getQueue(queueName);

@@ -44,13 +44,10 @@ export const attendeesApi = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.search) searchParams.set('search', params.search);
     const query = searchParams.toString();
-    return api.get<AttendeesResponse>(
-      `/events/${eventId}/attendees${query ? `?${query}` : ''}`
-    );
+    return api.get<AttendeesResponse>(`/events/${eventId}/attendees${query ? `?${query}` : ''}`);
   },
 
-  getById: (eventId: string, id: string) =>
-    api.get<Attendee>(`/events/${eventId}/attendees/${id}`),
+  getById: (eventId: string, id: string) => api.get<Attendee>(`/events/${eventId}/attendees/${id}`),
 
   update: (eventId: string, id: string, data: Partial<Attendee>) =>
     api.put<Attendee>(`/events/${eventId}/attendees/${id}`, data),

@@ -27,11 +27,11 @@ export class AnalyticsController {
   async exportAttendees(
     @Param('eventId') eventId: string,
     @Query('format') format: 'csv' | 'xlsx' = 'csv',
-    @Res() res: Response,
+    @Res() res: Response
   ) {
     const { filename, content, contentType } = await this.analyticsService.exportAttendees(
       eventId,
-      format,
+      format
     );
 
     res.setHeader('Content-Type', contentType);

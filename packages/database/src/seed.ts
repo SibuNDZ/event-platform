@@ -34,26 +34,146 @@ function generateQRCode(): string {
 
 // Sample attendee data for realistic demos
 const sampleAttendees = [
-  { firstName: 'Emma', lastName: 'Johnson', email: 'emma.johnson@techcorp.io', company: 'TechCorp', jobTitle: 'Senior Developer' },
-  { firstName: 'Liam', lastName: 'Williams', email: 'liam.w@startuplab.com', company: 'StartupLab', jobTitle: 'CTO' },
-  { firstName: 'Olivia', lastName: 'Brown', email: 'olivia.brown@innovate.co', company: 'Innovate Inc', jobTitle: 'Product Manager' },
-  { firstName: 'Noah', lastName: 'Jones', email: 'noah.j@cloudnine.tech', company: 'CloudNine', jobTitle: 'DevOps Engineer' },
-  { firstName: 'Ava', lastName: 'Garcia', email: 'ava.garcia@datadriven.io', company: 'DataDriven', jobTitle: 'Data Scientist' },
-  { firstName: 'Ethan', lastName: 'Miller', email: 'ethan.m@webworks.com', company: 'WebWorks', jobTitle: 'Frontend Lead' },
-  { firstName: 'Sophia', lastName: 'Davis', email: 'sophia.d@aiventures.ai', company: 'AI Ventures', jobTitle: 'ML Engineer' },
-  { firstName: 'Mason', lastName: 'Rodriguez', email: 'mason.r@scalable.io', company: 'Scalable Systems', jobTitle: 'Backend Developer' },
-  { firstName: 'Isabella', lastName: 'Martinez', email: 'isabella.m@designstudio.co', company: 'Design Studio', jobTitle: 'UX Designer' },
-  { firstName: 'William', lastName: 'Anderson', email: 'will.a@securetech.com', company: 'SecureTech', jobTitle: 'Security Analyst' },
-  { firstName: 'Mia', lastName: 'Taylor', email: 'mia.taylor@fintech.io', company: 'FinTech Solutions', jobTitle: 'Software Architect' },
-  { firstName: 'James', lastName: 'Thomas', email: 'james.t@mobileapp.dev', company: 'MobileApp Dev', jobTitle: 'iOS Developer' },
-  { firstName: 'Charlotte', lastName: 'Hernandez', email: 'charlotte.h@quantum.tech', company: 'Quantum Tech', jobTitle: 'Research Engineer' },
-  { firstName: 'Benjamin', lastName: 'Moore', email: 'ben.moore@cloudops.io', company: 'CloudOps', jobTitle: 'SRE' },
-  { firstName: 'Amelia', lastName: 'Martin', email: 'amelia.m@healthtech.com', company: 'HealthTech', jobTitle: 'Full Stack Developer' },
-  { firstName: 'Lucas', lastName: 'Jackson', email: 'lucas.j@edtech.io', company: 'EdTech Plus', jobTitle: 'Engineering Manager' },
-  { firstName: 'Harper', lastName: 'Thompson', email: 'harper.t@greentech.co', company: 'GreenTech', jobTitle: 'Sustainability Engineer' },
-  { firstName: 'Henry', lastName: 'White', email: 'henry.w@robotics.ai', company: 'Robotics AI', jobTitle: 'Robotics Engineer' },
-  { firstName: 'Evelyn', lastName: 'Harris', email: 'evelyn.h@biotech.com', company: 'BioTech Labs', jobTitle: 'Bioinformatics Lead' },
-  { firstName: 'Alexander', lastName: 'Sanchez', email: 'alex.s@gamedev.io', company: 'GameDev Studio', jobTitle: 'Game Developer' },
+  {
+    firstName: 'Emma',
+    lastName: 'Johnson',
+    email: 'emma.johnson@techcorp.io',
+    company: 'TechCorp',
+    jobTitle: 'Senior Developer',
+  },
+  {
+    firstName: 'Liam',
+    lastName: 'Williams',
+    email: 'liam.w@startuplab.com',
+    company: 'StartupLab',
+    jobTitle: 'CTO',
+  },
+  {
+    firstName: 'Olivia',
+    lastName: 'Brown',
+    email: 'olivia.brown@innovate.co',
+    company: 'Innovate Inc',
+    jobTitle: 'Product Manager',
+  },
+  {
+    firstName: 'Noah',
+    lastName: 'Jones',
+    email: 'noah.j@cloudnine.tech',
+    company: 'CloudNine',
+    jobTitle: 'DevOps Engineer',
+  },
+  {
+    firstName: 'Ava',
+    lastName: 'Garcia',
+    email: 'ava.garcia@datadriven.io',
+    company: 'DataDriven',
+    jobTitle: 'Data Scientist',
+  },
+  {
+    firstName: 'Ethan',
+    lastName: 'Miller',
+    email: 'ethan.m@webworks.com',
+    company: 'WebWorks',
+    jobTitle: 'Frontend Lead',
+  },
+  {
+    firstName: 'Sophia',
+    lastName: 'Davis',
+    email: 'sophia.d@aiventures.ai',
+    company: 'AI Ventures',
+    jobTitle: 'ML Engineer',
+  },
+  {
+    firstName: 'Mason',
+    lastName: 'Rodriguez',
+    email: 'mason.r@scalable.io',
+    company: 'Scalable Systems',
+    jobTitle: 'Backend Developer',
+  },
+  {
+    firstName: 'Isabella',
+    lastName: 'Martinez',
+    email: 'isabella.m@designstudio.co',
+    company: 'Design Studio',
+    jobTitle: 'UX Designer',
+  },
+  {
+    firstName: 'William',
+    lastName: 'Anderson',
+    email: 'will.a@securetech.com',
+    company: 'SecureTech',
+    jobTitle: 'Security Analyst',
+  },
+  {
+    firstName: 'Mia',
+    lastName: 'Taylor',
+    email: 'mia.taylor@fintech.io',
+    company: 'FinTech Solutions',
+    jobTitle: 'Software Architect',
+  },
+  {
+    firstName: 'James',
+    lastName: 'Thomas',
+    email: 'james.t@mobileapp.dev',
+    company: 'MobileApp Dev',
+    jobTitle: 'iOS Developer',
+  },
+  {
+    firstName: 'Charlotte',
+    lastName: 'Hernandez',
+    email: 'charlotte.h@quantum.tech',
+    company: 'Quantum Tech',
+    jobTitle: 'Research Engineer',
+  },
+  {
+    firstName: 'Benjamin',
+    lastName: 'Moore',
+    email: 'ben.moore@cloudops.io',
+    company: 'CloudOps',
+    jobTitle: 'SRE',
+  },
+  {
+    firstName: 'Amelia',
+    lastName: 'Martin',
+    email: 'amelia.m@healthtech.com',
+    company: 'HealthTech',
+    jobTitle: 'Full Stack Developer',
+  },
+  {
+    firstName: 'Lucas',
+    lastName: 'Jackson',
+    email: 'lucas.j@edtech.io',
+    company: 'EdTech Plus',
+    jobTitle: 'Engineering Manager',
+  },
+  {
+    firstName: 'Harper',
+    lastName: 'Thompson',
+    email: 'harper.t@greentech.co',
+    company: 'GreenTech',
+    jobTitle: 'Sustainability Engineer',
+  },
+  {
+    firstName: 'Henry',
+    lastName: 'White',
+    email: 'henry.w@robotics.ai',
+    company: 'Robotics AI',
+    jobTitle: 'Robotics Engineer',
+  },
+  {
+    firstName: 'Evelyn',
+    lastName: 'Harris',
+    email: 'evelyn.h@biotech.com',
+    company: 'BioTech Labs',
+    jobTitle: 'Bioinformatics Lead',
+  },
+  {
+    firstName: 'Alexander',
+    lastName: 'Sanchez',
+    email: 'alex.s@gamedev.io',
+    company: 'GameDev Studio',
+    jobTitle: 'Game Developer',
+  },
 ];
 
 async function main() {
@@ -216,7 +336,8 @@ async function main() {
         organizationId: organization.id,
         name: 'AI & ML Conference 2025',
         slug: 'ai-ml-conference-2025',
-        description: 'Explore the latest advancements in artificial intelligence and machine learning.',
+        description:
+          'Explore the latest advancements in artificial intelligence and machine learning.',
         shortDescription: 'Leading the AI revolution.',
         type: EventType.VIRTUAL,
         status: EventStatus.PUBLISHED,
@@ -295,7 +416,8 @@ async function main() {
         id: 'vip-pass',
         eventId: mainEvent.id,
         name: 'VIP Pass',
-        description: 'All-access pass including workshops, networking events, and exclusive sessions',
+        description:
+          'All-access pass including workshops, networking events, and exclusive sessions',
         price: 799,
         quantity: 500,
         earlyBirdPrice: 599,
@@ -411,7 +533,15 @@ async function main() {
             name: 'dietary_requirements',
             label: 'Dietary Requirements',
             type: 'SELECT',
-            options: JSON.stringify(['None', 'Vegetarian', 'Vegan', 'Gluten-free', 'Halal', 'Kosher', 'Other']),
+            options: JSON.stringify([
+              'None',
+              'Vegetarian',
+              'Vegan',
+              'Gluten-free',
+              'Halal',
+              'Kosher',
+              'Other',
+            ]),
             isRequired: false,
             sortOrder: 1,
           },
@@ -488,7 +618,8 @@ async function main() {
   for (let i = 0; i < sampleAttendees.length; i++) {
     const attendeeData = sampleAttendees[i];
     const ticketType = i < 5 ? ticketTypes[1] : i < 15 ? ticketTypes[0] : ticketTypes[2]; // VIP, General, Virtual
-    const ticketPrice = ticketType.id === 'vip-pass' ? 799 : ticketType.id === 'general-admission' ? 299 : 99;
+    const ticketPrice =
+      ticketType.id === 'vip-pass' ? 799 : ticketType.id === 'general-admission' ? 299 : 99;
 
     // Create attendee
     const attendee = await prisma.attendee.upsert({

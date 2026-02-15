@@ -57,9 +57,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <div className="w-12 h-12 bg-primary rounded-lg mx-auto mb-4" />
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account
-          </CardDescription>
+          <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -98,10 +96,7 @@ export default function LoginPage() {
                 <input type="checkbox" className="rounded border-gray-300" />
                 <span className="ml-2 text-sm">Remember me</span>
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
+              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -110,7 +105,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-primary hover:underline">
               Sign up
             </Link>

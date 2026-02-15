@@ -38,21 +38,16 @@ export interface MeResponse {
 }
 
 export const authApi = {
-  login: (data: LoginRequest) =>
-    api.post<AuthResponse>('/auth/login', data, { skipAuth: true }),
+  login: (data: LoginRequest) => api.post<AuthResponse>('/auth/login', data, { skipAuth: true }),
 
   register: (data: RegisterRequest) =>
     api.post<AuthResponse>('/auth/register', data, { skipAuth: true }),
 
-  refresh: () =>
-    api.post<RefreshResponse>('/auth/refresh', undefined, { skipAuth: true }),
+  refresh: () => api.post<RefreshResponse>('/auth/refresh', undefined, { skipAuth: true }),
 
-  logout: () =>
-    api.post<{ message: string }>('/auth/logout'),
+  logout: () => api.post<{ message: string }>('/auth/logout'),
 
-  getMe: () =>
-    api.get<MeResponse>('/auth/me'),
+  getMe: () => api.get<MeResponse>('/auth/me'),
 
-  getOrganizations: () =>
-    api.get<Organization[]>('/auth/organizations'),
+  getOrganizations: () => api.get<Organization[]>('/auth/organizations'),
 };

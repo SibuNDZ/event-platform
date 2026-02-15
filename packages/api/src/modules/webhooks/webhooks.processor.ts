@@ -15,14 +15,14 @@ export class WebhooksProcessor implements OnModuleInit {
   constructor(
     private readonly prisma: PrismaService,
     private readonly queueService: QueueService,
-    private readonly webhooksService: WebhooksService,
+    private readonly webhooksService: WebhooksService
   ) {}
 
   onModuleInit(): void {
     const worker = this.queueService.registerWorker(
       QUEUES.WEBHOOK,
       this.processDelivery.bind(this) as (job: Job) => Promise<unknown>,
-      3, // concurrency
+      3 // concurrency
     );
 
     if (worker) {
@@ -35,19 +35,14 @@ export class WebhooksProcessor implements OnModuleInit {
   private async processDelivery(job: Job<WebhookDeliveryJob>): Promise<void> {
     const { webhookId, deliveryId, url, secret, payload, attempt } = job.data;
 
-    this.logger.debug(
-      `Processing webhook delivery ${deliveryId} (attempt ${attempt})`,
-    );
+    this.logger.debug(`Processing webhook delivery ${deliveryId} (attempt ${attempt})`);
 
     const startTime = Date.now();
 
     try {
       // Generate signature
       const payloadString = JSON.stringify(payload);
-      const signature = this.webhooksService.generateSignature(
-        payloadString,
-        secret,
-      );
+      const signature = this.webhooksService.generateSignature(payloadString, secret);
 
       // Make HTTP request
       const response = await fetch(url, {
@@ -87,7 +82,7 @@ export class WebhooksProcessor implements OnModuleInit {
         });
 
         this.logger.debug(
-          `Webhook delivery ${deliveryId} succeeded with status ${response.status}`,
+          `Webhook delivery ${deliveryId} succeeded with status ${response.status}`
         );
       } else {
         // Non-2xx response - treat as failure
@@ -95,7 +90,7 @@ export class WebhooksProcessor implements OnModuleInit {
           `HTTP ${response.status}`,
           response.status,
           responseBody,
-          responseTime,
+          responseTime
         );
       }
     } catch (error) {
@@ -108,7 +103,7 @@ export class WebhooksProcessor implements OnModuleInit {
         attempt,
         isWebhookError ? error.statusCode : null,
         isWebhookError ? error.responseBody : (error as Error).message,
-        responseTime,
+        responseTime
       );
 
       // Rethrow to let BullMQ handle retry
@@ -122,13 +117,11 @@ export class WebhooksProcessor implements OnModuleInit {
     attempt: number,
     statusCode: number | null,
     responseBody: string | null,
-    responseTime: number,
+    responseTime: number
   ): Promise<void> {
     const shouldRetry = attempt < MAX_ATTEMPTS;
     const retryDelaySeconds = RETRY_DELAYS[Math.min(attempt - 1, RETRY_DELAYS.length - 1)] || 960;
-    const nextRetryAt = shouldRetry
-      ? new Date(Date.now() + retryDelaySeconds * 1000)
-      : null;
+    const nextRetryAt = shouldRetry ? new Date(Date.now() + retryDelaySeconds * 1000) : null;
 
     await this.prisma.webhookDelivery.update({
       where: { id: deliveryId },
@@ -156,13 +149,13 @@ export class WebhooksProcessor implements OnModuleInit {
       });
 
       this.logger.warn(
-        `Webhook ${webhookId} disabled after ${webhook.failureCount} consecutive failures`,
+        `Webhook ${webhookId} disabled after ${webhook.failureCount} consecutive failures`
       );
     }
 
     this.logger.warn(
       `Webhook delivery ${deliveryId} failed (attempt ${attempt}/${MAX_ATTEMPTS})` +
-        (shouldRetry ? ` - retrying at ${nextRetryAt?.toISOString()}` : ' - giving up'),
+        (shouldRetry ? ` - retrying at ${nextRetryAt?.toISOString()}` : ' - giving up')
     );
   }
 }
@@ -172,7 +165,7 @@ class WebhookDeliveryError extends Error {
     message: string,
     public readonly statusCode: number | null,
     public readonly responseBody: string | null,
-    public readonly responseTime: number,
+    public readonly responseTime: number
   ) {
     super(message);
     this.name = 'WebhookDeliveryError';

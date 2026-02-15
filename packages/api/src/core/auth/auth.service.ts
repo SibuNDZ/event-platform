@@ -32,7 +32,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async validateUser(email: string, password: string): Promise<User | null> {
@@ -56,7 +56,9 @@ export class AuthService {
     return user;
   }
 
-  async register(dto: RegisterDto): Promise<{ user: User; organization?: Organization; tokens: AuthTokens }> {
+  async register(
+    dto: RegisterDto
+  ): Promise<{ user: User; organization?: Organization; tokens: AuthTokens }> {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -91,9 +93,7 @@ export class AuthService {
           where: { slug },
         });
 
-        const finalSlug = existingOrg
-          ? `${slug}-${uuidv4().slice(0, 8)}`
-          : slug;
+        const finalSlug = existingOrg ? `${slug}-${uuidv4().slice(0, 8)}` : slug;
 
         organization = await tx.organization.create({
           data: {
@@ -116,10 +116,7 @@ export class AuthService {
     });
 
     // Generate tokens
-    const tokens = await this.generateTokens(
-      result.user,
-      result.organization?.id
-    );
+    const tokens = await this.generateTokens(result.user, result.organization?.id);
 
     // Update last login
     await this.prisma.user.update({
@@ -134,7 +131,10 @@ export class AuthService {
     };
   }
 
-  async login(user: User, organizationId?: string): Promise<{ user: User; organization?: Organization; tokens: AuthTokens }> {
+  async login(
+    user: User,
+    organizationId?: string
+  ): Promise<{ user: User; organization?: Organization; tokens: AuthTokens }> {
     let organization: Organization | undefined;
 
     if (organizationId) {
@@ -265,9 +265,7 @@ export class AuthService {
       },
     });
 
-    const expiresIn = this.parseDuration(
-      this.configService.get<string>('JWT_EXPIRES_IN', '15m')
-    );
+    const expiresIn = this.parseDuration(this.configService.get<string>('JWT_EXPIRES_IN', '15m'));
 
     return {
       accessToken,
@@ -284,15 +282,24 @@ export class AuthService {
     const unit = match[2];
 
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      default: return 15 * 60 * 1000;
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 15 * 60 * 1000;
     }
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });

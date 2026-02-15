@@ -7,7 +7,7 @@ import { TicketType } from '@event-platform/database';
 export class TicketTypesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async create(eventId: string, dto: any): Promise<TicketType> {

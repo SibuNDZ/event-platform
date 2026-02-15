@@ -63,6 +63,11 @@
     "@types/pdfkit": "^0.13.4",
     "@types/qrcode": "^1.5.5",
     "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }

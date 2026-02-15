@@ -46,21 +46,16 @@ export class StorageService {
 
     this.s3Client = new S3Client({
       region: 'auto',
-      endpoint: isLocal
-        ? 'http://localhost:9000'
-        : `https://${accountId}.r2.cloudflarestorage.com`,
+      endpoint: isLocal ? 'http://localhost:9000' : `https://${accountId}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId: isLocal ? 'minioadmin' : (accessKeyId || ''),
-        secretAccessKey: isLocal ? 'minioadmin' : (secretAccessKey || ''),
+        accessKeyId: isLocal ? 'minioadmin' : accessKeyId || '',
+        secretAccessKey: isLocal ? 'minioadmin' : secretAccessKey || '',
       },
       forcePathStyle: isLocal, // Required for MinIO
     });
   }
 
-  async upload(
-    buffer: Buffer,
-    options: UploadOptions = {},
-  ): Promise<UploadResult> {
+  async upload(buffer: Buffer, options: UploadOptions = {}): Promise<UploadResult> {
     const {
       folder = 'uploads',
       filename,
@@ -81,7 +76,7 @@ export class StorageService {
         ContentType: contentType,
         Metadata: metadata,
         ...(isPublic && { ACL: 'public-read' }),
-      }),
+      })
     );
 
     const result: UploadResult = {
@@ -102,7 +97,7 @@ export class StorageService {
       resize?: { width?: number; height?: number };
       quality?: number;
       format?: 'jpeg' | 'png' | 'webp';
-    } = {},
+    } = {}
   ): Promise<UploadResult> {
     const { resize, quality = 80, format = 'webp', ...uploadOptions } = options;
 
@@ -142,7 +137,7 @@ export class StorageService {
         new GetObjectCommand({
           Bucket: this.bucket,
           Key: key,
-        }),
+        })
       );
 
       if (response.Body) {
@@ -167,7 +162,7 @@ export class StorageService {
       new DeleteObjectCommand({
         Bucket: this.bucket,
         Key: key,
-      }),
+      })
     );
   }
 
@@ -184,7 +179,7 @@ export class StorageService {
       new ListObjectsV2Command({
         Bucket: this.bucket,
         Prefix: prefix,
-      }),
+      })
     );
 
     return (response.Contents || []).map((obj) => ({
@@ -200,7 +195,7 @@ export class StorageService {
         new HeadObjectCommand({
           Bucket: this.bucket,
           Key: key,
-        }),
+        })
       );
       return true;
     } catch {
@@ -217,11 +212,7 @@ export class StorageService {
     return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
-  async getUploadUrl(
-    key: string,
-    contentType: string,
-    expiresIn = 3600,
-  ): Promise<string> {
+  async getUploadUrl(key: string, contentType: string, expiresIn = 3600): Promise<string> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,

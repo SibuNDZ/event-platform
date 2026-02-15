@@ -77,8 +77,7 @@ export const eventsApi = {
 
   create: (data: CreateEventRequest) => api.post<Event>('/events', data),
 
-  update: (id: string, data: Partial<CreateEventRequest>) =>
-    api.put<Event>(`/events/${id}`, data),
+  update: (id: string, data: Partial<CreateEventRequest>) => api.put<Event>(`/events/${id}`, data),
 
   delete: (id: string) => api.delete<void>(`/events/${id}`),
 

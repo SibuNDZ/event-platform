@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
@@ -45,7 +40,7 @@ export class WebhooksService {
     private readonly prisma: PrismaService,
     private readonly tenantService: TenantService,
     private readonly queueService: QueueService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async create(dto: CreateWebhookDto): Promise<Webhook> {
@@ -212,7 +207,7 @@ export class WebhooksService {
 
   async getDeliveries(
     webhookId: string,
-    query: WebhookDeliveryQueryDto,
+    query: WebhookDeliveryQueryDto
   ): Promise<{
     data: WebhookDelivery[];
     total: number;
@@ -328,7 +323,7 @@ export class WebhooksService {
   async trigger(
     organizationId: string,
     event: WebhookEventType,
-    data: Record<string, unknown>,
+    data: Record<string, unknown>
   ): Promise<void> {
     // Find all active webhooks subscribed to this event
     const webhooks = await this.prisma.webhook.findMany({
@@ -343,9 +338,7 @@ export class WebhooksService {
       return;
     }
 
-    this.logger.debug(
-      `Triggering ${webhooks.length} webhooks for event ${event}`,
-    );
+    this.logger.debug(`Triggering ${webhooks.length} webhooks for event ${event}`);
 
     for (const webhook of webhooks) {
       const payload: WebhookPayload = {
@@ -411,9 +404,7 @@ export class WebhooksService {
   private validateEventTypes(events: string[]): void {
     const invalidEvents = events.filter((e) => !ALL_WEBHOOK_EVENTS.includes(e as WebhookEventType));
     if (invalidEvents.length > 0) {
-      throw new ForbiddenException(
-        `Invalid event types: ${invalidEvents.join(', ')}`,
-      );
+      throw new ForbiddenException(`Invalid event types: ${invalidEvents.join(', ')}`);
     }
   }
 

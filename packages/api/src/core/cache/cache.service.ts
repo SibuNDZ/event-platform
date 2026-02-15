@@ -9,7 +9,7 @@ export class CacheService {
 
   constructor(
     @Inject(REDIS_CLIENT)
-    private readonly redis: Redis | null,
+    private readonly redis: Redis | null
   ) {
     if (!redis) {
       this.logger.warn('Running with in-memory cache (no Redis)');
@@ -27,7 +27,11 @@ export class CacheService {
         this.memory.delete(key);
         return null;
       }
-      try { return JSON.parse(entry.value) as T; } catch { return entry.value as T; }
+      try {
+        return JSON.parse(entry.value) as T;
+      } catch {
+        return entry.value as T;
+      }
     }
     const value = await this.redis.get(key);
     if (!value) return null;
@@ -55,7 +59,10 @@ export class CacheService {
   }
 
   async del(key: string): Promise<void> {
-    if (!this.redis) { this.memory.delete(key); return; }
+    if (!this.redis) {
+      this.memory.delete(key);
+      return;
+    }
     await this.redis.del(key);
   }
 
@@ -76,7 +83,10 @@ export class CacheService {
   async exists(key: string): Promise<boolean> {
     if (!this.redis) {
       const entry = this.memory.get(key);
-      if (!entry || this.isMemoryExpired(entry)) { this.memory.delete(key); return false; }
+      if (!entry || this.isMemoryExpired(entry)) {
+        this.memory.delete(key);
+        return false;
+      }
       return true;
     }
     const result = await this.redis.exists(key);
@@ -124,7 +134,9 @@ export class CacheService {
 
   // Hash operations
   async hget<T>(key: string, field: string): Promise<T | null> {
-    if (!this.redis) { return null; }
+    if (!this.redis) {
+      return null;
+    }
     const value = await this.redis.hget(key, field);
     if (!value) return null;
     try {
@@ -135,13 +147,17 @@ export class CacheService {
   }
 
   async hset(key: string, field: string, value: unknown): Promise<void> {
-    if (!this.redis) { return; }
+    if (!this.redis) {
+      return;
+    }
     const serialized = typeof value === 'string' ? value : JSON.stringify(value);
     await this.redis.hset(key, field, serialized);
   }
 
   async hgetall<T>(key: string): Promise<Record<string, T>> {
-    if (!this.redis) { return {}; }
+    if (!this.redis) {
+      return {};
+    }
     const data = await this.redis.hgetall(key);
     const result: Record<string, T> = {};
     for (const [field, value] of Object.entries(data)) {
@@ -155,29 +171,33 @@ export class CacheService {
   }
 
   async hdel(key: string, field: string): Promise<void> {
-    if (!this.redis) { return; }
+    if (!this.redis) {
+      return;
+    }
     await this.redis.hdel(key, field);
   }
 
   // List operations
   async lpush(key: string, ...values: unknown[]): Promise<number> {
-    if (!this.redis) { return 0; }
-    const serialized = values.map((v) =>
-      typeof v === 'string' ? v : JSON.stringify(v)
-    );
+    if (!this.redis) {
+      return 0;
+    }
+    const serialized = values.map((v) => (typeof v === 'string' ? v : JSON.stringify(v)));
     return this.redis.lpush(key, ...serialized);
   }
 
   async rpush(key: string, ...values: unknown[]): Promise<number> {
-    if (!this.redis) { return 0; }
-    const serialized = values.map((v) =>
-      typeof v === 'string' ? v : JSON.stringify(v)
-    );
+    if (!this.redis) {
+      return 0;
+    }
+    const serialized = values.map((v) => (typeof v === 'string' ? v : JSON.stringify(v)));
     return this.redis.rpush(key, ...serialized);
   }
 
   async lrange<T>(key: string, start: number, stop: number): Promise<T[]> {
-    if (!this.redis) { return []; }
+    if (!this.redis) {
+      return [];
+    }
     const values = await this.redis.lrange(key, start, stop);
     return values.map((v) => {
       try {
@@ -190,39 +210,45 @@ export class CacheService {
 
   // Set operations
   async sadd(key: string, ...members: string[]): Promise<number> {
-    if (!this.redis) { return 0; }
+    if (!this.redis) {
+      return 0;
+    }
     return this.redis.sadd(key, ...members);
   }
 
   async srem(key: string, ...members: string[]): Promise<number> {
-    if (!this.redis) { return 0; }
+    if (!this.redis) {
+      return 0;
+    }
     return this.redis.srem(key, ...members);
   }
 
   async smembers(key: string): Promise<string[]> {
-    if (!this.redis) { return []; }
+    if (!this.redis) {
+      return [];
+    }
     return this.redis.smembers(key);
   }
 
   async sismember(key: string, member: string): Promise<boolean> {
-    if (!this.redis) { return false; }
+    if (!this.redis) {
+      return false;
+    }
     const result = await this.redis.sismember(key, member);
     return result === 1;
   }
 
   // Pub/Sub
   async publish(channel: string, message: unknown): Promise<number> {
-    if (!this.redis) { return 0; }
+    if (!this.redis) {
+      return 0;
+    }
     const serialized = typeof message === 'string' ? message : JSON.stringify(message);
     return this.redis.publish(channel, serialized);
   }
 
   // Cache with callback (cache aside pattern)
-  async cached<T>(
-    key: string,
-    ttlSeconds: number,
-    callback: () => Promise<T>,
-  ): Promise<T> {
+  async cached<T>(key: string, ttlSeconds: number, callback: () => Promise<T>): Promise<T> {
     const cached = await this.get<T>(key);
     if (cached !== null) {
       return cached;

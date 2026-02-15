@@ -7,7 +7,7 @@ import { BadgeTemplate } from '@event-platform/database';
 export class BadgesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async createTemplate(eventId: string, dto: any): Promise<BadgeTemplate> {

@@ -10,7 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SessionsService, CreateSessionDto, UpdateSessionDto } from './sessions.service';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/tenant/tenant.guard';
@@ -26,10 +26,7 @@ export class SessionsController {
   @Post()
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create a session' })
-  async create(
-    @Param('eventId') eventId: string,
-    @Body() dto: Omit<CreateSessionDto, 'eventId'>,
-  ) {
+  async create(@Param('eventId') eventId: string, @Body() dto: Omit<CreateSessionDto, 'eventId'>) {
     return this.sessionsService.create({ ...dto, eventId });
   }
 

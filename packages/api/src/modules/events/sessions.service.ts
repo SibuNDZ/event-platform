@@ -28,7 +28,7 @@ export interface UpdateSessionDto {
 export class SessionsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async create(dto: CreateSessionDto): Promise<EventSession> {
@@ -84,7 +84,7 @@ export class SessionsService {
   }
 
   async update(id: string, dto: UpdateSessionDto): Promise<EventSession> {
-    const session = await this.findOne(id);
+    await this.findOne(id);
 
     return this.prisma.eventSession.update({
       where: { id },

@@ -7,7 +7,7 @@ import { Organization } from '@event-platform/database';
 export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async getCurrent(): Promise<Organization> {

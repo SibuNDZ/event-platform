@@ -10,7 +10,7 @@ import { AUTH_COOKIE_ACCESS } from '../auth.constants';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([

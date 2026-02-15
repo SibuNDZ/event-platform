@@ -7,7 +7,7 @@ import { Speaker } from '@event-platform/database';
 export class SpeakersService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async create(eventId: string, dto: any): Promise<Speaker> {

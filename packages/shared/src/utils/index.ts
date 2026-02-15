@@ -33,7 +33,7 @@ export const simpleHash = (str: string): string => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
   return Math.abs(hash).toString(36);
@@ -60,7 +60,10 @@ export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOpt
   });
 };
 
-export const formatDateTime = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
+export const formatDateTime = (
+  date: Date | string,
+  options?: Intl.DateTimeFormatOptions
+): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleString('en-US', {
     year: 'numeric',
@@ -82,11 +85,7 @@ export const formatTime = (date: Date | string, options?: Intl.DateTimeFormatOpt
 };
 
 // Currency formatting
-export const formatCurrency = (
-  amount: number,
-  currency = 'USD',
-  locale = 'en-US'
-): string => {
+export const formatCurrency = (amount: number, currency = 'USD', locale = 'en-US'): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
@@ -179,11 +178,7 @@ export const sleep = (ms: number): Promise<void> => {
 };
 
 // Retry utility
-export const retry = async <T>(
-  fn: () => Promise<T>,
-  retries = 3,
-  delay = 1000
-): Promise<T> => {
+export const retry = async <T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
   try {
     return await fn();
   } catch (error) {

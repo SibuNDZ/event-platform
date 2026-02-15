@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
@@ -40,7 +35,7 @@ export class IntegrationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tenantService: TenantService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   // ==================== API KEY MANAGEMENT ====================
@@ -118,10 +113,7 @@ export class IntegrationsService {
         keyPrefix,
         keyHash,
         revokedAt: null,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } },
-        ],
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
     });
 

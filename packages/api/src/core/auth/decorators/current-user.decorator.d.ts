@@ -1,2 +1,0 @@
-export declare const CurrentUser: (...dataOrPipes: ("id" | "email" | "firstName" | "lastName" | "phone" | "createdAt" | "updatedAt" | "status" | "deletedAt" | "passwordHash" | "avatarUrl" | "emailVerified" | "emailVerifiedAt" | "mfaEnabled" | "mfaSecret" | "ssoProvider" | "ssoProviderId" | "lastLoginAt" | import("@nestjs/common").PipeTransform<any, any> | import("@nestjs/common").Type<import("@nestjs/common").PipeTransform<any, any>> | undefined)[]) => ParameterDecorator;
-//# sourceMappingURL=current-user.decorator.d.ts.map

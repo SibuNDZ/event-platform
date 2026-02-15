@@ -1,5 +1,5 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Controller, Post, Body } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { Public } from '../../core/auth/decorators/public.decorator';
 
@@ -11,7 +11,7 @@ export class PaymentsController {
   @Post('webhook/stripe')
   @Public()
   @ApiOperation({ summary: 'Stripe webhook endpoint' })
-  async stripeWebhook(@Body() body: any) {
+  async stripeWebhook(@Body() _body: any) {
     // Handle Stripe webhooks
     return { received: true };
   }

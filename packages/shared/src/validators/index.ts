@@ -20,7 +20,10 @@ export const slugSchema = z
   .string()
   .min(3, 'Slug must be at least 3 characters')
   .max(100, 'Slug must be less than 100 characters')
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug can only contain lowercase letters, numbers, and hyphens');
+  .regex(
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    'Slug can only contain lowercase letters, numbers, and hyphens'
+  );
 
 export const urlSchema = z.string().url('Invalid URL').optional();
 
@@ -50,23 +53,27 @@ export const forgotPasswordSchema = z.object({
   email: emailSchema,
 });
 
-export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
-  password: passwordSchema,
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, 'Token is required'),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
-export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: passwordSchema,
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 // Organization schemas
 export const createOrganizationSchema = z.object({
@@ -129,10 +136,13 @@ const sessionBaseSchema = z.object({
   capacity: z.number().int().positive().optional(),
 });
 
-export const createSessionSchema = sessionBaseSchema.refine((data) => data.endTime > data.startTime, {
-  message: 'End time must be after start time',
-  path: ['endTime'],
-});
+export const createSessionSchema = sessionBaseSchema.refine(
+  (data) => data.endTime > data.startTime,
+  {
+    message: 'End time must be after start time',
+    path: ['endTime'],
+  }
+);
 
 export const updateSessionSchema = sessionBaseSchema.omit({ eventId: true }).partial();
 
@@ -168,7 +178,9 @@ export const createTicketTypeSchema = z.object({
   salesEndDate: z.coerce.date().optional(),
   earlyBirdPrice: z.number().min(0).optional(),
   earlyBirdEndDate: z.coerce.date().optional(),
-  attendeeType: z.enum(['GENERAL', 'VIP', 'SPEAKER', 'SPONSOR', 'EXHIBITOR', 'STAFF', 'PRESS']).default('GENERAL'),
+  attendeeType: z
+    .enum(['GENERAL', 'VIP', 'SPEAKER', 'SPONSOR', 'EXHIBITOR', 'STAFF', 'PRESS'])
+    .default('GENERAL'),
   isVisible: z.boolean().default(true),
   isTransferable: z.boolean().default(false),
 });
@@ -209,14 +221,16 @@ export const registrationSchema = z.object({
   quantity: z.number().int().positive().max(10),
   attendees: z.array(attendeeSchema).min(1),
   couponCode: z.string().optional(),
-  billingAddress: z.object({
-    line1: z.string().max(200),
-    line2: z.string().max(200).optional(),
-    city: z.string().max(100),
-    state: z.string().max(100).optional(),
-    postalCode: z.string().max(20),
-    country: z.string().length(2),
-  }).optional(),
+  billingAddress: z
+    .object({
+      line1: z.string().max(200),
+      line2: z.string().max(200).optional(),
+      city: z.string().max(100),
+      state: z.string().max(100).optional(),
+      postalCode: z.string().max(20),
+      country: z.string().length(2),
+    })
+    .optional(),
 });
 
 // Check-in schemas
@@ -246,12 +260,16 @@ export const createSurveySchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   isAnonymous: z.boolean().default(false),
-  questions: z.array(z.object({
-    question: z.string().min(1).max(500),
-    type: z.enum(['text', 'rating', 'single_choice', 'multiple_choice', 'scale']),
-    options: z.array(z.string()).optional(),
-    isRequired: z.boolean().default(false),
-  })).min(1),
+  questions: z
+    .array(
+      z.object({
+        question: z.string().min(1).max(500),
+        type: z.enum(['text', 'rating', 'single_choice', 'multiple_choice', 'scale']),
+        options: z.array(z.string()).optional(),
+        isRequired: z.boolean().default(false),
+      })
+    )
+    .min(1),
 });
 
 // Type exports

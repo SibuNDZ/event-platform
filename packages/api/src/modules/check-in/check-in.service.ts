@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
 import { CheckIn, TicketStatus } from '@event-platform/database';
@@ -37,7 +32,7 @@ export interface CheckInResult {
 export class CheckInService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async checkIn(dto: CheckInDto): Promise<CheckInResult> {
@@ -50,9 +45,7 @@ export class CheckInService {
           include: { event: true },
         },
         checkIns: {
-          where: dto.checkpointId
-            ? { checkpointId: dto.checkpointId }
-            : { checkpointId: null },
+          where: dto.checkpointId ? { checkpointId: dto.checkpointId } : { checkpointId: null },
           orderBy: { checkedInAt: 'desc' },
           take: 1,
         },

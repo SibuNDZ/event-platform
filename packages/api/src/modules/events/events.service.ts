@@ -16,7 +16,7 @@ export class EventsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tenantService: TenantService,
-    private readonly cacheService: CacheService,
+    private readonly cacheService: CacheService
   ) {}
 
   async create(dto: CreateEventDto): Promise<Event> {
@@ -252,7 +252,7 @@ export class EventsService {
     }
 
     // Handle slug change
-    let slug = dto.slug;
+    const slug = dto.slug;
     if (slug && slug !== event.slug) {
       const existing = await this.prisma.event.findUnique({
         where: { organizationId_slug: { organizationId, slug } },
@@ -387,7 +387,7 @@ export class EventsService {
   }
 
   async getStats(id: string) {
-    const event = await this.findOne(id);
+    await this.findOne(id);
 
     const [attendeeStats, orderStats, checkInStats] = await Promise.all([
       this.prisma.attendee.groupBy({

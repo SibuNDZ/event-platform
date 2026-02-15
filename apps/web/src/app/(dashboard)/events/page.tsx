@@ -24,9 +24,7 @@ export default function EventsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Events</h1>
-          <p className="text-muted-foreground">
-            Manage your events and track registrations.
-          </p>
+          <p className="text-muted-foreground">Manage your events and track registrations.</p>
         </div>
         <Card className="border-destructive">
           <CardContent className="pt-6">
@@ -42,9 +40,7 @@ export default function EventsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Events</h1>
-          <p className="text-muted-foreground">
-            Manage your events and track registrations.
-          </p>
+          <p className="text-muted-foreground">Manage your events and track registrations.</p>
         </div>
         <Button onClick={handleCreateEvent}>Create Event</Button>
       </div>
@@ -83,8 +79,8 @@ export default function EventsPage() {
                       event.status === 'PUBLISHED'
                         ? 'bg-green-100 text-green-700'
                         : event.status === 'CANCELLED'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-yellow-100 text-yellow-700'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-yellow-100 text-yellow-700'
                     }`}
                   >
                     {event.status.charAt(0) + event.status.slice(1).toLowerCase()}

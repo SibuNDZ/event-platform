@@ -27,7 +27,10 @@ export class BadgesController {
   @Post('templates')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create badge template' })
-  async createTemplate(@Param('eventId') eventId: string, @Body() dto: any): Promise<BadgeTemplate> {
+  async createTemplate(
+    @Param('eventId') eventId: string,
+    @Body() dto: any
+  ): Promise<BadgeTemplate> {
     return this.badgesService.createTemplate(eventId, dto);
   }
 

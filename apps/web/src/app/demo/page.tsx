@@ -22,14 +22,16 @@ export default function DemoPage() {
     setIsLoading(true);
 
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsSubmitted(true);
     setIsLoading(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -55,13 +57,24 @@ export default function DemoPage() {
         <main className="flex-1 flex items-center justify-center px-4">
           <div className="text-center max-w-md">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <h1 className="text-3xl font-bold mb-4">Thank You!</h1>
             <p className="text-muted-foreground mb-8">
-              Your demo request has been received. One of our team members will contact you within 24 hours to schedule your personalized demo.
+              Your demo request has been received. One of our team members will contact you within
+              24 hours to schedule your personalized demo.
             </p>
             <Link href="/">
               <Button>Back to Home</Button>
@@ -103,43 +116,80 @@ export default function DemoPage() {
             <div>
               <h1 className="text-4xl font-bold mb-4">Request a Demo</h1>
               <p className="text-xl text-muted-foreground mb-8">
-                See how EventPlatform can transform your event management. Get a personalized walkthrough from our team.
+                See how EventPlatform can transform your event management. Get a personalized
+                walkthrough from our team.
               </p>
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-5 h-5 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h3 className="font-semibold">Personalized Demo</h3>
-                    <p className="text-muted-foreground">Tailored to your specific event needs and use cases</p>
+                    <p className="text-muted-foreground">
+                      Tailored to your specific event needs and use cases
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-5 h-5 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h3 className="font-semibold">30-Minute Session</h3>
-                    <p className="text-muted-foreground">Quick and focused overview of key features</p>
+                    <p className="text-muted-foreground">
+                      Quick and focused overview of key features
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <svg
+                      className="w-5 h-5 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h3 className="font-semibold">Expert Guidance</h3>
-                    <p className="text-muted-foreground">Get answers to all your questions from our specialists</p>
+                    <p className="text-muted-foreground">
+                      Get answers to all your questions from our specialists
+                    </p>
                   </div>
                 </div>
               </div>
@@ -279,9 +329,14 @@ export default function DemoPage() {
 
                 <p className="text-xs text-muted-foreground text-center">
                   By submitting this form, you agree to our{' '}
-                  <Link href="/privacy" className="underline">Privacy Policy</Link>
-                  {' '}and{' '}
-                  <Link href="/terms" className="underline">Terms of Service</Link>.
+                  <Link href="/privacy" className="underline">
+                    Privacy Policy
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/terms" className="underline">
+                    Terms of Service
+                  </Link>
+                  .
                 </p>
               </form>
             </div>

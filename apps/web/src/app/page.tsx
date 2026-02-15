@@ -10,28 +10,23 @@ export default function Home() {
     },
     {
       title: 'Zero-friction check-in',
-      description:
-        'QR scanning, offline mode, and session access control keep lines moving.',
+      description: 'QR scanning, offline mode, and session access control keep lines moving.',
     },
     {
       title: 'Real-time intelligence',
-      description:
-        'Live dashboards for attendance, revenue, and engagement across every event.',
+      description: 'Live dashboards for attendance, revenue, and engagement across every event.',
     },
     {
       title: 'Trusted integrations',
-      description:
-        'Stripe, Resend, S3, webhooks, and API keys for the rest of your stack.',
+      description: 'Stripe, Resend, S3, webhooks, and API keys for the rest of your stack.',
     },
     {
       title: 'Enterprise controls',
-      description:
-        'Multi-tenant roles, audit logs, and tiered licensing from day one.',
+      description: 'Multi-tenant roles, audit logs, and tiered licensing from day one.',
     },
     {
       title: 'Scale without surprises',
-      description:
-        'Queue-backed processing and Redis caching keep latency low under load.',
+      description: 'Queue-backed processing and Redis caching keep latency low under load.',
     },
   ];
 
@@ -284,10 +279,7 @@ export default function Home() {
                     ))}
                   </ul>
                   <Link href={plan.slug === 'enterprise' ? '/demo' : `/register?plan=${plan.slug}`}>
-                    <Button
-                      className="w-full"
-                      variant={plan.popular ? 'default' : 'outline'}
-                    >
+                    <Button className="w-full" variant={plan.popular ? 'default' : 'outline'}>
                       Get Started
                     </Button>
                   </Link>

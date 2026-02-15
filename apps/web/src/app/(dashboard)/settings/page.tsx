@@ -59,9 +59,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account and organization settings.
-        </p>
+        <p className="text-muted-foreground">Manage your account and organization settings.</p>
       </div>
 
       <div className="grid gap-6">
@@ -77,9 +75,7 @@ export default function SettingsPage() {
                 <input
                   type="text"
                   value={profileForm.firstName || user?.firstName || ''}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, firstName: e.target.value })
-                  }
+                  onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
                   className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -88,9 +84,7 @@ export default function SettingsPage() {
                 <input
                   type="text"
                   value={profileForm.lastName || user?.lastName || ''}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, lastName: e.target.value })
-                  }
+                  onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
                   className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -156,17 +150,12 @@ export default function SettingsPage() {
                   <label className="text-sm font-medium">Description</label>
                   <textarea
                     value={orgForm.description}
-                    onChange={(e) =>
-                      setOrgForm({ ...orgForm, description: e.target.value })
-                    }
+                    onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
                     rows={3}
                     className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
-                <Button
-                  onClick={handleUpdateOrganization}
-                  disabled={updateOrganization.isPending}
-                >
+                <Button onClick={handleUpdateOrganization} disabled={updateOrganization.isPending}>
                   {updateOrganization.isPending ? 'Saving...' : 'Update Organization'}
                 </Button>
               </>
@@ -197,9 +186,7 @@ export default function SettingsPage() {
               <input
                 type="password"
                 value={passwordForm.newPassword}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, newPassword: e.target.value })
-                }
+                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                 placeholder="Enter new password"
                 className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />

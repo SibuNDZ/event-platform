@@ -85,11 +85,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
       <DashboardContent>{children}</DashboardContent>

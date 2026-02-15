@@ -18,7 +18,7 @@ export class MarketingService {
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
-    private readonly captchaService: CaptchaService,
+    private readonly captchaService: CaptchaService
   ) {}
 
   async createDemoLead(dto: CreateDemoLeadDto, meta: LeadMeta) {

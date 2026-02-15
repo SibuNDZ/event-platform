@@ -36,8 +36,7 @@ export interface UpdateOrganizationRequest {
 export const organizationsApi = {
   getCurrent: () => api.get<OrganizationDetails>('/organization'),
 
-  update: (data: UpdateOrganizationRequest) =>
-    api.put<OrganizationDetails>('/organization', data),
+  update: (data: UpdateOrganizationRequest) => api.put<OrganizationDetails>('/organization', data),
 
   getMembers: () => api.get<OrganizationMember[]>('/organization/members'),
 };

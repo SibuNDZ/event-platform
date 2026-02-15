@@ -9,7 +9,6 @@ import {
   IsDateString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 
 export enum IntegrationType {
   SALESFORCE = 'salesforce',

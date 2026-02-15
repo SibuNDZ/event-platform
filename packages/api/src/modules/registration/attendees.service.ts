@@ -7,7 +7,7 @@ import { Attendee, Prisma } from '@event-platform/database';
 export class AttendeesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tenantService: TenantService,
+    private readonly tenantService: TenantService
   ) {}
 
   async findByEvent(eventId: string, query: any = {}) {

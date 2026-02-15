@@ -3,20 +3,16 @@ import { LicenseTier } from '@event-platform/database';
 import { TierFeatures } from '@event-platform/shared';
 
 // Get current tenant context from request
-export const CurrentTenant = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.tenant;
-  },
-);
+export const CurrentTenant = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.tenant;
+});
 
 // Get current organization ID
-export const OrganizationId = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.tenant?.organizationId;
-  },
-);
+export const OrganizationId = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.tenant?.organizationId;
+});
 
 // Require specific roles
 export const ROLES_KEY = 'roles';

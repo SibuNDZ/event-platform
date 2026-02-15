@@ -1,5 +1,5 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { Organization, LicenseTier } from '@event-platform/database';
+import { Organization } from '@event-platform/database';
 import { TIER_FEATURES, TierFeatures } from '@event-platform/shared';
 
 export interface TenantContext {

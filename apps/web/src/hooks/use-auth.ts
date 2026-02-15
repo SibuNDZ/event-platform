@@ -8,8 +8,7 @@ import { ApiClientError } from '@/lib/api/client';
 
 export function useAuth() {
   const router = useRouter();
-  const { user, organization, isAuthenticated, isHydrated, setAuth, clearAuth } =
-    useAuthStore();
+  const { user, organization, isAuthenticated, isHydrated, setAuth, clearAuth } = useAuthStore();
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),

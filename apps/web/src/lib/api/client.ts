@@ -64,10 +64,7 @@ async function handleTokenRefresh(): Promise<boolean> {
   return refreshPromise;
 }
 
-export async function apiClient<T>(
-  endpoint: string,
-  options: RequestOptions = {}
-): Promise<T> {
+export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { body, skipAuth, ...fetchOptions } = options;
   const { isAuthenticated } = useAuthStore.getState();
 

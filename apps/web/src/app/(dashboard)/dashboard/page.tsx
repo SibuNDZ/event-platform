@@ -24,7 +24,9 @@ export default function DashboardPage() {
     },
     {
       name: 'Total Attendees',
-      value: data?.events?.reduce((acc, e) => acc + (e._count?.attendees || 0), 0).toLocaleString() || '0',
+      value:
+        data?.events?.reduce((acc, e) => acc + (e._count?.attendees || 0), 0).toLocaleString() ||
+        '0',
       change: 'Across all events',
     },
     {
@@ -39,9 +41,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back! Here's an overview of your events.
-          </p>
+          <p className="text-muted-foreground">Welcome back! Here&apos;s an overview of your events.</p>
         </div>
         <Card className="border-destructive">
           <CardContent className="pt-6">
@@ -56,9 +56,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's an overview of your events.
-        </p>
+        <p className="text-muted-foreground">Welcome back! Here&apos;s an overview of your events.</p>
       </div>
 
       {/* Stats */}
@@ -121,17 +119,14 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
-                      {event._count?.attendees || 0} attendees
-                    </p>
+                    <p className="font-medium">{event._count?.attendees || 0} attendees</p>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        event.status === 'PUBLISHED'
+                      className={`text-xs px-2 py-1 rounded-full ${event.status === 'PUBLISHED'
                           ? 'bg-green-100 text-green-700'
                           : event.status === 'CANCELLED'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
                     >
                       {event.status.charAt(0) + event.status.slice(1).toLowerCase()}
                     </span>

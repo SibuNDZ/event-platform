@@ -28,7 +28,10 @@ async function bootstrap() {
     : [configService.get<string>('FRONTEND_URL', 'http://localhost:3000')];
 
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void
+    ) => {
       // Allow requests with no origin (server-to-server, health checks)
       if (!origin) return callback(null, true);
       // Allow exact matches from CORS_ORIGINS
@@ -36,7 +39,8 @@ async function bootstrap() {
       // Allow all Vercel preview deployments
       if (origin.endsWith('.vercel.app')) return callback(null, true);
       // Allow custom domain
-      if (origin.endsWith('.vibrant-events.co.za') || origin === 'https://vibrant-events.co.za') return callback(null, true);
+      if (origin.endsWith('.vibrant-events.co.za') || origin === 'https://vibrant-events.co.za')
+        return callback(null, true);
       // Allow localhost in development
       if (origin.startsWith('http://localhost:')) return callback(null, true);
       callback(null, false);

@@ -68,9 +68,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <div className="w-12 h-12 bg-primary rounded-lg mx-auto mb-4" />
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
-            Start managing your events in minutes
-          </CardDescription>
+          <CardDescription>Start managing your events in minutes</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -33,7 +33,7 @@ import type { AuthTokens } from '@event-platform/shared';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   @Post('register')
@@ -41,10 +41,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email already registered' })
-  async register(
-    @Body() dto: RegisterDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const { user, organization, tokens } = await this.authService.register(dto);
     this.setAuthCookies(res, tokens);
     return {
@@ -72,11 +69,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(
-    @Req() req: any,
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Req() req: any, @Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const { user, organization, tokens } = await this.authService.login(
       req.user,
       dto.organizationId
@@ -111,7 +104,7 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Body() dto: RefreshTokenDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ) {
     const refreshToken = this.getRefreshToken(req, dto);
     if (!refreshToken) {
@@ -131,7 +124,7 @@ export class AuthController {
   async logout(
     @Req() req: Request,
     @Body() dto: RefreshTokenDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ) {
     const refreshToken = this.getRefreshToken(req, dto);
     if (refreshToken) {
@@ -147,10 +140,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout from all devices' })
   @ApiResponse({ status: 200, description: 'Logged out from all devices' })
-  async logoutAll(
-    @CurrentUser() user: User,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logoutAll(@CurrentUser() user: User, @Res({ passthrough: true }) res: Response) {
     await this.authService.logoutAll(user.id);
     this.clearAuthCookies(res);
     return { message: 'Logged out from all devices' };
@@ -200,12 +190,9 @@ export class AuthController {
   async switchOrganization(
     @CurrentUser() user: User,
     @Body() dto: SwitchOrganizationDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ) {
-    const tokens = await this.authService.switchOrganization(
-      user.id,
-      dto.organizationId
-    );
+    const tokens = await this.authService.switchOrganization(user.id, dto.organizationId);
     this.setAuthCookies(res, tokens);
     return { expiresIn: tokens.expiresIn };
   }
@@ -216,15 +203,8 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
-  async changePassword(
-    @CurrentUser() user: User,
-    @Body() dto: ChangePasswordDto
-  ) {
-    await this.authService.changePassword(
-      user.id,
-      dto.currentPassword,
-      dto.newPassword
-    );
+  async changePassword(@CurrentUser() user: User, @Body() dto: ChangePasswordDto) {
+    await this.authService.changePassword(user.id, dto.currentPassword, dto.newPassword);
     return { message: 'Password changed successfully' };
   }
 
@@ -232,15 +212,11 @@ export class AuthController {
     const cookieOptions = this.getCookieOptions();
     res.cookie(AUTH_COOKIE_ACCESS, tokens.accessToken, {
       ...cookieOptions,
-      maxAge: this.parseDuration(
-        this.configService.get<string>('JWT_EXPIRES_IN', '15m')
-      ),
+      maxAge: this.parseDuration(this.configService.get<string>('JWT_EXPIRES_IN', '15m')),
     });
     res.cookie(AUTH_COOKIE_REFRESH, tokens.refreshToken, {
       ...cookieOptions,
-      maxAge: this.parseDuration(
-        this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d')
-      ),
+      maxAge: this.parseDuration(this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d')),
     });
   }
 

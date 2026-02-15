@@ -9,15 +9,18 @@ export default function OrdersPage() {
   const { data, isLoading, error } = useEvents({ limit: 100 });
 
   // Calculate stats from events data
-  const totalAttendees = data?.events?.reduce(
-    (acc, e) => acc + (e._count?.attendees || 0),
-    0
-  ) || 0;
+  const totalAttendees = data?.events?.reduce((acc, e) => acc + (e._count?.attendees || 0), 0) || 0;
 
   const stats = [
     { name: 'Total Registrations', value: totalAttendees.toLocaleString() },
-    { name: 'Events with Sales', value: data?.events?.filter(e => (e._count?.attendees || 0) > 0).length.toString() || '0' },
-    { name: 'Published Events', value: data?.events?.filter(e => e.status === 'PUBLISHED').length.toString() || '0' },
+    {
+      name: 'Events with Sales',
+      value: data?.events?.filter((e) => (e._count?.attendees || 0) > 0).length.toString() || '0',
+    },
+    {
+      name: 'Published Events',
+      value: data?.events?.filter((e) => e.status === 'PUBLISHED').length.toString() || '0',
+    },
     { name: 'Total Events', value: data?.total?.toString() || '0' },
   ];
 
@@ -26,9 +29,7 @@ export default function OrdersPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-muted-foreground">
-            Track ticket sales and manage orders.
-          </p>
+          <p className="text-muted-foreground">Track ticket sales and manage orders.</p>
         </div>
         <Card className="border-destructive">
           <CardContent className="pt-6">
@@ -43,9 +44,7 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Orders</h1>
-        <p className="text-muted-foreground">
-          Track ticket sales and manage orders.
-        </p>
+        <p className="text-muted-foreground">Track ticket sales and manage orders.</p>
       </div>
 
       {isLoading ? (
@@ -123,8 +122,8 @@ export default function OrdersPage() {
                             event.status === 'PUBLISHED'
                               ? 'bg-green-100 text-green-700'
                               : event.status === 'CANCELLED'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-yellow-100 text-yellow-700'
                           }`}
                         >
                           {event.status.charAt(0) + event.status.slice(1).toLowerCase()}

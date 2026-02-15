@@ -10,12 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { IntegrationsService, IntegrationConfig } from './integrations.service';
 import {
   CreateApiKeyDto,
@@ -100,7 +95,7 @@ export class IntegrationsController {
   @ApiResponse({ status: 404, description: 'Integration not found' })
   async updateIntegration(
     @Param('id') id: string,
-    @Body() dto: UpdateIntegrationDto,
+    @Body() dto: UpdateIntegrationDto
   ): Promise<IntegrationConfig> {
     return this.integrationsService.updateIntegration(id, dto);
   }
@@ -119,7 +114,7 @@ export class IntegrationsController {
   @ApiResponse({ status: 200, description: 'OAuth URL' })
   getOAuthUrl(
     @Param('type') type: IntegrationType,
-    @Query('state') state: string,
+    @Query('state') state: string
   ): { url: string } {
     return { url: this.integrationsService.getOAuthUrl(type, state) };
   }

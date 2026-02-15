@@ -10,12 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { WebhooksService } from './webhooks.service';
 import {
   CreateWebhookDto,
@@ -70,10 +65,7 @@ export class WebhooksController {
   @ApiOperation({ summary: 'Update a webhook' })
   @ApiResponse({ status: 200, description: 'Webhook updated successfully' })
   @ApiResponse({ status: 404, description: 'Webhook not found' })
-  async update(
-    @Param('id') id: string,
-    @Body() dto: UpdateWebhookDto,
-  ): Promise<Webhook> {
+  async update(@Param('id') id: string, @Body() dto: UpdateWebhookDto): Promise<Webhook> {
     return this.webhooksService.update(id, dto);
   }
 
@@ -98,10 +90,7 @@ export class WebhooksController {
   @ApiOperation({ summary: 'Send a test webhook delivery' })
   @ApiResponse({ status: 200, description: 'Test webhook queued' })
   @ApiResponse({ status: 404, description: 'Webhook not found' })
-  async test(
-    @Param('id') id: string,
-    @Body() dto: TestWebhookDto,
-  ): Promise<WebhookDelivery> {
+  async test(@Param('id') id: string, @Body() dto: TestWebhookDto): Promise<WebhookDelivery> {
     return this.webhooksService.testWebhook(id, dto.event);
   }
 
@@ -111,7 +100,7 @@ export class WebhooksController {
   @ApiResponse({ status: 404, description: 'Webhook not found' })
   async getDeliveries(
     @Param('id') id: string,
-    @Query() query: WebhookDeliveryQueryDto,
+    @Query() query: WebhookDeliveryQueryDto
   ): Promise<{
     data: WebhookDelivery[];
     total: number;

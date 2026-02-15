@@ -13,10 +13,9 @@ export default function AttendeesPage() {
   const { data: eventsData, isLoading: eventsLoading } = useEvents({ limit: 100 });
   const [selectedEventId, setSelectedEventId] = useState<string>('');
 
-  const { data: attendeesData, isLoading: attendeesLoading } = useAttendees(
-    selectedEventId,
-    { limit: 50 }
-  );
+  const { data: attendeesData, isLoading: attendeesLoading } = useAttendees(selectedEventId, {
+    limit: 50,
+  });
 
   const isLoading = eventsLoading || (selectedEventId && attendeesLoading);
 
@@ -30,9 +29,7 @@ export default function AttendeesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Attendees</h1>
-          <p className="text-muted-foreground">
-            View and manage all registered attendees.
-          </p>
+          <p className="text-muted-foreground">View and manage all registered attendees.</p>
         </div>
         <Button disabled={!attendeesData?.attendees?.length}>Export List</Button>
       </div>
@@ -118,12 +115,8 @@ export default function AttendeesPage() {
                       <td className="py-3 px-4 font-medium">
                         {attendee.firstName} {attendee.lastName}
                       </td>
-                      <td className="py-3 px-4 text-muted-foreground">
-                        {attendee.email}
-                      </td>
-                      <td className="py-3 px-4">
-                        {attendee.ticketType?.name || 'General'}
-                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">{attendee.email}</td>
+                      <td className="py-3 px-4">{attendee.ticketType?.name || 'General'}</td>
                       <td className="py-3 px-4 text-muted-foreground">
                         {format(new Date(attendee.registeredAt), 'MMM d, yyyy')}
                       </td>
@@ -133,10 +126,10 @@ export default function AttendeesPage() {
                             attendee.status === 'CHECKED_IN'
                               ? 'bg-green-100 text-green-700'
                               : attendee.status === 'CONFIRMED'
-                              ? 'bg-blue-100 text-blue-700'
-                              : attendee.status === 'CANCELLED'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-blue-100 text-blue-700'
+                                : attendee.status === 'CANCELLED'
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-yellow-100 text-yellow-700'
                           }`}
                         >
                           {attendee.status.replace('_', ' ')}

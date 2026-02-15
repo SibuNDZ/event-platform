@@ -33,9 +33,9 @@ export default function PrivacyPage() {
 
           <h2>1. Information We Collect</h2>
           <p>
-            Vibrant Events collects information you provide directly, including your name,
-            email address, organization details, and payment information when you register
-            for an account or purchase tickets through our platform.
+            Vibrant Events collects information you provide directly, including your name, email
+            address, organization details, and payment information when you register for an account
+            or purchase tickets through our platform.
           </p>
 
           <h2>2. How We Use Your Information</h2>
@@ -50,31 +50,29 @@ export default function PrivacyPage() {
 
           <h2>3. Data Sharing</h2>
           <p>
-            We do not sell your personal information. We may share data with event
-            organizers for events you register for, payment processors to complete
-            transactions, and service providers who assist in operating our platform.
+            We do not sell your personal information. We may share data with event organizers for
+            events you register for, payment processors to complete transactions, and service
+            providers who assist in operating our platform.
           </p>
 
           <h2>4. Data Security</h2>
           <p>
-            We implement industry-standard security measures including encryption in
-            transit and at rest, secure authentication, and regular security audits to
-            protect your information.
+            We implement industry-standard security measures including encryption in transit and at
+            rest, secure authentication, and regular security audits to protect your information.
           </p>
 
           <h2>5. Your Rights</h2>
           <p>
-            You have the right to access, correct, or delete your personal data. You may
-            also request a copy of your data or object to its processing. Contact us at{' '}
-            <a href="mailto:privacy@vibrant-events.co.za">privacy@vibrant-events.co.za</a>{' '}
-            to exercise these rights.
+            You have the right to access, correct, or delete your personal data. You may also
+            request a copy of your data or object to its processing. Contact us at{' '}
+            <a href="mailto:privacy@vibrant-events.co.za">privacy@vibrant-events.co.za</a> to
+            exercise these rights.
           </p>
 
           <h2>6. Cookies</h2>
           <p>
-            We use essential cookies for authentication and session management. Analytics
-            cookies are only used with your consent to help us understand how our platform
-            is used.
+            We use essential cookies for authentication and session management. Analytics cookies
+            are only used with your consent to help us understand how our platform is used.
           </p>
 
           <h2>7. Contact Us</h2>

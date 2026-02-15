@@ -69,7 +69,7 @@ export class EventsController {
   @ApiResponse({ status: 404, description: 'Event not found' })
   async findBySlug(
     @Param('slug') slug: string,
-    @Query('org') organizationSlug?: string,
+    @Query('org') organizationSlug?: string
   ): Promise<Event> {
     return this.eventsService.findBySlug(slug, organizationSlug);
   }

@@ -15,7 +15,11 @@ export default function AnalyticsPage() {
   const metrics = [
     { name: 'Total Events', value: totalEvents.toString(), change: 'All time' },
     { name: 'Published Events', value: publishedEvents.toString(), change: 'Currently live' },
-    { name: 'Total Registrations', value: totalAttendees.toLocaleString(), change: 'Across all events' },
+    {
+      name: 'Total Registrations',
+      value: totalAttendees.toLocaleString(),
+      change: 'Across all events',
+    },
     {
       name: 'Avg. Registrations',
       value: totalEvents > 0 ? Math.round(totalAttendees / totalEvents).toString() : '0',

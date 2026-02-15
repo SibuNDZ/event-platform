@@ -3,13 +3,13 @@ import { Reflector } from '@nestjs/core';
 import { TenantService } from './tenant.service';
 import { ROLES_KEY, TIER_KEY, FEATURE_KEY } from './tenant.decorator';
 import { LicenseTier } from '@event-platform/database';
-import { TierFeatures, TIER_FEATURES } from '@event-platform/shared';
+import { TierFeatures } from '@event-platform/shared';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private tenantService: TenantService,
+    private tenantService: TenantService
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -48,7 +48,7 @@ export class RolesGuard implements CanActivate {
 export class TierGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private tenantService: TenantService,
+    private tenantService: TenantService
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -89,7 +89,7 @@ export class TierGuard implements CanActivate {
 export class FeatureGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private tenantService: TenantService,
+    private tenantService: TenantService
   ) {}
 
   canActivate(context: ExecutionContext): boolean {

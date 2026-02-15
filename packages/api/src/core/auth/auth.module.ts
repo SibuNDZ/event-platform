@@ -23,13 +23,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    LocalStrategy,
-    JwtAuthGuard,
-    LocalAuthGuard,
-  ],
+  providers: [AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, LocalAuthGuard],
   exports: [AuthService, JwtAuthGuard],
 })
 export class AuthModule {}

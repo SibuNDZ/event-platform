@@ -42,6 +42,7 @@ This guide covers deploying the Event Platform to production.
    - Railway will detect the Dockerfile at `packages/api/Dockerfile`
 
 5. **Configure environment variables**:
+
    ```
    NODE_ENV=production
    PORT=3001
@@ -75,6 +76,7 @@ This guide covers deploying the Event Platform to production.
    - Install Command: `cd ../.. && pnpm install`
 
 3. **Set environment variables**:
+
    ```
    NEXT_PUBLIC_API_URL=https://your-api.up.railway.app
    ```
@@ -91,6 +93,7 @@ pnpm run db:seed
 ```
 
 Demo credentials:
+
 - Email: `demo@example.com`
 - Password: `demo123456`
 
@@ -160,25 +163,25 @@ app.yourdomain.com {
 
 ### Backend (packages/api/.env)
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `REDIS_URL` | Yes | Redis connection string |
-| `JWT_SECRET` | Yes | Secret for signing access tokens (min 32 chars) |
-| `JWT_REFRESH_SECRET` | Yes | Secret for signing refresh tokens (min 32 chars) |
-| `FRONTEND_URL` | Yes | Frontend URL for CORS |
-| `NODE_ENV` | Yes | `production` for prod |
-| `PORT` | No | API port (default: 3001) |
-| `STRIPE_SECRET_KEY` | No | Stripe API key for payments |
-| `RESEND_API_KEY` | No | Resend API key for emails |
-| `AWS_*` | No | S3 credentials for file uploads |
+| Variable             | Required | Description                                      |
+| -------------------- | -------- | ------------------------------------------------ |
+| `DATABASE_URL`       | Yes      | PostgreSQL connection string                     |
+| `REDIS_URL`          | Yes      | Redis connection string                          |
+| `JWT_SECRET`         | Yes      | Secret for signing access tokens (min 32 chars)  |
+| `JWT_REFRESH_SECRET` | Yes      | Secret for signing refresh tokens (min 32 chars) |
+| `FRONTEND_URL`       | Yes      | Frontend URL for CORS                            |
+| `NODE_ENV`           | Yes      | `production` for prod                            |
+| `PORT`               | No       | API port (default: 3001)                         |
+| `STRIPE_SECRET_KEY`  | No       | Stripe API key for payments                      |
+| `RESEND_API_KEY`     | No       | Resend API key for emails                        |
+| `AWS_*`              | No       | S3 credentials for file uploads                  |
 
 ### Frontend (apps/web/.env)
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_API_URL` | Yes | Backend API URL |
-| `NEXT_PUBLIC_APP_URL` | No | Frontend URL (for social sharing) |
+| Variable              | Required | Description                       |
+| --------------------- | -------- | --------------------------------- |
+| `NEXT_PUBLIC_API_URL` | Yes      | Backend API URL                   |
+| `NEXT_PUBLIC_APP_URL` | No       | Frontend URL (for social sharing) |
 
 ---
 

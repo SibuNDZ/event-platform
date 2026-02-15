@@ -18,9 +18,7 @@ export class MarketingController {
   async createDemoLead(@Req() req: Request, @Body() dto: CreateDemoLeadDto) {
     const forwardedFor = req.headers['x-forwarded-for'];
     const ipAddress =
-      typeof forwardedFor === 'string'
-        ? forwardedFor.split(',')[0]?.trim()
-        : req.ip;
+      typeof forwardedFor === 'string' ? forwardedFor.split(',')[0]?.trim() : req.ip;
 
     const lead = await this.marketingService.createDemoLead(dto, {
       ipAddress,

@@ -15,7 +15,7 @@ export interface RequestWithTenant extends Request {
 export class TenantMiddleware implements NestMiddleware {
   constructor(
     private readonly tenantService: TenantService,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaService
   ) {}
 
   async use(req: RequestWithTenant, res: Response, next: NextFunction) {

@@ -12,7 +12,7 @@ import {
   IsUrl,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { EventType, EventStatus } from '@event-platform/database';
 
 export class CreateEventDto {

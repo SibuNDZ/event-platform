@@ -151,7 +151,14 @@ export interface BadgeData {
 }
 
 // Payment types
-export type PaymentProvider = 'STRIPE' | 'PAYPAL' | 'ADYEN' | 'PAYU' | 'WOMPI' | 'MERCADOPAGO' | 'FREE';
+export type PaymentProvider =
+  | 'STRIPE'
+  | 'PAYPAL'
+  | 'ADYEN'
+  | 'PAYU'
+  | 'WOMPI'
+  | 'MERCADOPAGO'
+  | 'FREE';
 
 export interface PaymentIntent {
   id: string;

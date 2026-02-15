@@ -10,7 +10,7 @@ export class WebhookEventListener implements OnModuleInit {
   constructor(
     private readonly eventEmitter: EventEmitterService,
     @Inject(forwardRef(() => WebhooksService))
-    private readonly webhooksService: WebhooksService,
+    private readonly webhooksService: WebhooksService
   ) {}
 
   onModuleInit(): void {
@@ -32,12 +32,12 @@ export class WebhookEventListener implements OnModuleInit {
         {
           ...event.data,
           _metadata: event.metadata,
-        },
+        }
       );
     } catch (error) {
       this.logger.error(
         `Failed to trigger webhooks for event ${eventType}: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
     }
   }
