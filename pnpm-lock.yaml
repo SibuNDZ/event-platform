@@ -20,9 +20,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@event-platform/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.10.0(react-hook-form@7.71.1(react@18.3.1))
@@ -108,9 +105,6 @@ importers:
         specifier: ^4.5.2
         version: 4.5.7(@types/react@18.3.27)(react@18.3.1)
     devDependencies:
-      '@event-platform/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
