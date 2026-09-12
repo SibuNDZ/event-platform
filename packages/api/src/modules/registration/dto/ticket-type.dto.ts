@@ -10,8 +10,10 @@ import {
   IsString,
   MaxLength,
   Min,
+  Matches,
   MinLength,
 } from 'class-validator';
+import { CURRENCY_MESSAGE, ISO_CURRENCY_CODE } from '../../../common/currency';
 
 export class CreateTicketTypeDto {
   @ApiProperty({ example: 'General Admission' })
@@ -35,7 +37,7 @@ export class CreateTicketTypeDto {
   @ApiPropertyOptional({ example: 'ZAR' })
   @IsOptional()
   @IsString()
-  @MaxLength(8)
+  @Matches(ISO_CURRENCY_CODE, { message: CURRENCY_MESSAGE })
   currency?: string;
 
   @ApiPropertyOptional()
@@ -116,7 +118,7 @@ export class UpdateTicketTypeDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @MaxLength(8)
+  @Matches(ISO_CURRENCY_CODE, { message: CURRENCY_MESSAGE })
   currency?: string;
 
   @ApiPropertyOptional()

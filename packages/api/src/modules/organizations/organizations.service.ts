@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
 import { Organization } from '@event-platform/database';
+import { normalizeCurrency } from '../../common/currency';
 
 @Injectable()
 export class OrganizationsService {
@@ -49,7 +50,7 @@ export class OrganizationsService {
         ...(data.websiteUrl !== undefined && { websiteUrl: data.websiteUrl }),
         ...(data.website !== undefined && { websiteUrl: data.website }),
         ...(data.timezone !== undefined && { timezone: data.timezone }),
-        ...(data.currency !== undefined && { currency: data.currency }),
+        ...(data.currency !== undefined && { currency: normalizeCurrency(data.currency) }),
         ...(data.locale !== undefined && { locale: data.locale }),
       },
     });

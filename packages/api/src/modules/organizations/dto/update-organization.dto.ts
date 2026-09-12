@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { CURRENCY_MESSAGE, ISO_CURRENCY_CODE } from '../../../common/currency';
 
 export class UpdateOrganizationDto {
   @ApiPropertyOptional()
@@ -32,7 +33,7 @@ export class UpdateOrganizationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @MaxLength(8)
+  @Matches(ISO_CURRENCY_CODE, { message: CURRENCY_MESSAGE })
   currency?: string;
 
   @ApiPropertyOptional()

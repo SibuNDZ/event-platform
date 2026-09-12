@@ -10,6 +10,7 @@ import { CacheService } from '../../core/cache/cache.service';
 import { Event, EventStatus, EventType, Prisma } from '@event-platform/database';
 import { generateSlug } from '@event-platform/shared';
 import { CreateEventDto, UpdateEventDto, EventQueryDto } from './dto/event.dto';
+import { normalizeCurrency } from '../../common/currency';
 
 @Injectable()
 export class EventsService {
@@ -68,7 +69,7 @@ export class EventsService {
         venueAddress: dto.venueAddress,
         venueCity: dto.venueCity,
         venueCountry: dto.venueCountry,
-        currency: dto.currency || 'USD',
+        currency: normalizeCurrency(dto.currency) || 'USD',
         maxAttendees: dto.maxAttendees,
         isPublic: dto.isPublic ?? true,
       },
@@ -251,6 +252,8 @@ export class EventsService {
       throw new NotFoundException('Event not found');
     }
 
+    const currency = normalizeCurrency(dto.currency);
+
     // Handle slug change
     const slug = dto.slug;
     if (slug && slug !== event.slug) {
@@ -278,13 +281,19 @@ export class EventsService {
         ...(dto.venueAddress !== undefined && { venueAddress: dto.venueAddress }),
         ...(dto.venueCity !== undefined && { venueCity: dto.venueCity }),
         ...(dto.venueCountry !== undefined && { venueCountry: dto.venueCountry }),
-        ...(dto.currency && { currency: dto.currency }),
+        ...(currency && { currency }),
         ...(dto.maxAttendees !== undefined && { maxAttendees: dto.maxAttendees }),
         ...(dto.isPublic !== undefined && { isPublic: dto.isPublic }),
         ...(dto.coverImageUrl !== undefined && { coverImageUrl: dto.coverImageUrl }),
         ...(dto.logoUrl !== undefined && { logoUrl: dto.logoUrl }),
       },
     });
+
+    if (currency && currency !== event.currency) {
+      // Ticket types inherit the event currency; keep them in step so checkout
+      // never sends Stripe a stale or malformed code.
+      await this.prisma.ticketType.updateMany({ where: { eventId: id }, data: { currency } });
+    }
 
     await this.invalidateEventCache(organizationId, id);
 

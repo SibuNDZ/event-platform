@@ -10,7 +10,9 @@ import {
   MinLength,
   MaxLength,
   IsUrl,
+  Matches,
 } from 'class-validator';
+import { CURRENCY_MESSAGE, ISO_CURRENCY_CODE } from '../../../common/currency';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { EventType, EventStatus } from '@event-platform/database';
@@ -83,9 +85,10 @@ export class CreateEventDto {
   @MaxLength(100)
   venueCountry?: string;
 
-  @ApiPropertyOptional({ example: 'USD' })
+  @ApiPropertyOptional({ example: 'ZAR' })
   @IsOptional()
   @IsString()
+  @Matches(ISO_CURRENCY_CODE, { message: CURRENCY_MESSAGE })
   currency?: string;
 
   @ApiPropertyOptional({ example: 5000 })
@@ -171,9 +174,10 @@ export class UpdateEventDto {
   @MaxLength(100)
   venueCountry?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: 'ZAR' })
   @IsOptional()
   @IsString()
+  @Matches(ISO_CURRENCY_CODE, { message: CURRENCY_MESSAGE })
   currency?: string;
 
   @ApiPropertyOptional()
