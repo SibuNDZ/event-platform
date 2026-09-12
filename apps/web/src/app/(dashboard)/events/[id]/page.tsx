@@ -8,7 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { CardSkeleton } from '@/components/ui/loading-skeleton';
 import { useEvent, usePublishEvent, useUnpublishEvent, useUpdateEvent } from '@/hooks/use-events';
-import { useCreateTicketType, useDeleteTicketType, useTicketTypes } from '@/hooks/use-ticket-types';
+import {
+  useCreateTicketType,
+  useDeleteTicketType,
+  useTicketTypes,
+  useUpdateTicketType,
+} from '@/hooks/use-ticket-types';
 import { toast } from '@/components/ui/use-toast';
 import { ApiClientError } from '@/lib/api/client';
 import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
@@ -27,6 +32,7 @@ export default function EventDetailPage() {
   const unpublishEvent = useUnpublishEvent();
   const createTicketType = useCreateTicketType(eventId);
   const deleteTicketType = useDeleteTicketType(eventId);
+  const updateTicketType = useUpdateTicketType(eventId);
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -90,6 +96,32 @@ export default function EventDetailPage() {
       toast({
         variant: 'destructive',
         title: 'Could not change status',
+        description: err instanceof ApiClientError ? err.message : 'Please try again.',
+      });
+    }
+  };
+
+  const removeTicketType = async (id: string) => {
+    try {
+      await deleteTicketType.mutateAsync(id);
+      toast({ title: 'Ticket type removed' });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Could not remove ticket type',
+        description: err instanceof ApiClientError ? err.message : 'Please try again.',
+      });
+    }
+  };
+
+  const toggleTicketVisibility = async (id: string, isVisible: boolean) => {
+    try {
+      await updateTicketType.mutateAsync({ id, data: { isVisible } });
+      toast({ title: isVisible ? 'Ticket type shown' : 'Ticket type hidden' });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Could not update ticket type',
         description: err instanceof ApiClientError ? err.message : 'Please try again.',
       });
     }
@@ -299,13 +331,29 @@ export default function EventDetailPage() {
                     {ticket.quantity != null ? ` / ${ticket.quantity}` : ''}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => deleteTicketType.mutate(ticket.id)}
-                  disabled={deleteTicketType.isPending}
-                >
-                  Remove
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!ticket.isVisible && (
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Hidden
+                    </span>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleTicketVisibility(ticket.id, !ticket.isVisible)}
+                    disabled={updateTicketType.isPending}
+                  >
+                    {ticket.isVisible ? 'Hide' : 'Show'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeTicketType(ticket.id)}
+                    disabled={deleteTicketType.isPending}
+                  >
+                    Remove
+                  </Button>
+                </div>
               </div>
             ))}
             {ticketTypes?.length === 0 && (

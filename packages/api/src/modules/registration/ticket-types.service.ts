@@ -1,5 +1,10 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { TicketType } from '@event-platform/database';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { OrderStatus, TicketType } from '@event-platform/database';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
 import { CreateTicketTypeDto, UpdateTicketTypeDto } from './dto/ticket-type.dto';
@@ -83,9 +88,52 @@ export class TicketTypesService {
     });
   }
 
+  /**
+   * Order items reference ticket types without a cascade, so a plain delete
+   * fails once anyone has started a registration. Abandoned registrations
+   * (orders still PENDING or FAILED, no ticket issued) are cleaned up with the
+   * ticket type; anything that produced a ticket blocks the delete.
+   */
   async delete(eventId: string, id: string): Promise<void> {
     await this.findOne(eventId, id);
-    await this.prisma.ticketType.delete({ where: { id } });
+
+    const items = await this.prisma.orderItem.findMany({
+      where: { ticketTypeId: id },
+      select: {
+        orderId: true,
+        attendeeId: true,
+        order: { select: { status: true } },
+        ticket: { select: { id: true } },
+      },
+    });
+
+    const abandonedStatuses: OrderStatus[] = [OrderStatus.PENDING, OrderStatus.FAILED];
+    const blocking = items.filter(
+      (item) => item.ticket || !abandonedStatuses.includes(item.order.status)
+    );
+    if (blocking.length > 0) {
+      throw new BadRequestException(
+        'This ticket type has completed orders and cannot be deleted. Hide it instead.'
+      );
+    }
+
+    const orderIds = [...new Set(items.map((item) => item.orderId))];
+    const attendeeIds = [
+      ...new Set(items.map((item) => item.attendeeId).filter((v): v is string => Boolean(v))),
+    ];
+
+    await this.prisma.$transaction(async (tx) => {
+      if (orderIds.length > 0) {
+        await tx.order.deleteMany({ where: { id: { in: orderIds } } });
+      }
+      if (attendeeIds.length > 0) {
+        // Only attendees that no longer belong to any order.
+        await tx.attendee.deleteMany({
+          where: { id: { in: attendeeIds }, orderItems: { none: {} } },
+        });
+      }
+      await tx.ticketType.delete({ where: { id } });
+    });
   }
 
   private async verifyEventAccess(eventId: string) {
