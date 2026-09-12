@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { usePublicEvent } from '@/hooks/use-events';
 import { registrationApi } from '@/lib/api/registration';
 import { ApiClientError } from '@/lib/api/client';
+import { isSoldOut, ticketOptionLabel } from '@/lib/tickets';
 
 function PublicEventPage() {
   const params = useParams<{ slug: string }>();
@@ -25,8 +26,10 @@ function PublicEventPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const selected =
-    event?.ticketTypes?.find((ticket) => ticket.id === ticketTypeId) || event?.ticketTypes?.[0];
+  const ticketTypes = event?.ticketTypes || [];
+  const registrationOpen = ticketTypes.length > 0;
+  const firstAvailable = ticketTypes.find((ticket) => !isSoldOut(ticket));
+  const selected = ticketTypes.find((ticket) => ticket.id === ticketTypeId) || firstAvailable;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,80 +105,92 @@ function PublicEventPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4" onSubmit={submit}>
-                  <div className="space-y-2">
-                    {(event.ticketTypes || []).map((ticket) => (
-                      <label
-                        key={ticket.id}
-                        className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 ${
-                          (ticketTypeId || selected?.id) === ticket.id ? 'border-primary' : ''
-                        }`}
-                      >
-                        <span>
-                          <input
-                            type="radio"
-                            className="mr-3"
-                            checked={(ticketTypeId || selected?.id) === ticket.id}
-                            onChange={() => setTicketTypeId(ticket.id)}
-                          />
-                          {ticket.name}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {ticket.currency} {Number(ticket.price).toLocaleString()}
-                        </span>
+                {!registrationOpen ? (
+                  <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                    Registration is not open yet. The organizer has not added any ticket types for
+                    this event. Check back soon.
+                  </div>
+                ) : (
+                  <form className="space-y-4" onSubmit={submit}>
+                    <div className="space-y-2">
+                      <label htmlFor="ticket-type" className="text-sm font-medium">
+                        Ticket type
                       </label>
-                    ))}
-                    {!event.ticketTypes?.length && (
-                      <p className="text-sm text-muted-foreground">Registration is not open yet.</p>
-                    )}
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                      <select
+                        id="ticket-type"
+                        required
+                        value={selected?.id || ''}
+                        onChange={(e) => setTicketTypeId(e.target.value)}
+                        className="w-full rounded-md border bg-background px-3 py-2"
+                      >
+                        {!selected && (
+                          <option value="" disabled>
+                            Select a ticket type
+                          </option>
+                        )}
+                        {ticketTypes.map((ticket) => (
+                          <option key={ticket.id} value={ticket.id} disabled={isSoldOut(ticket)}>
+                            {ticketOptionLabel(ticket)}
+                          </option>
+                        ))}
+                      </select>
+                      {selected?.description && (
+                        <p className="text-sm text-muted-foreground">{selected.description}</p>
+                      )}
+                      {!selected && (
+                        <p className="text-sm text-destructive">All ticket types are sold out.</p>
+                      )}
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input
+                        required
+                        placeholder="First name"
+                        value={form.firstName}
+                        onChange={(e) =>
+                          setForm((prev) => ({ ...prev, firstName: e.target.value }))
+                        }
+                        className="rounded-md border px-3 py-2"
+                      />
+                      <input
+                        required
+                        placeholder="Last name"
+                        value={form.lastName}
+                        onChange={(e) => setForm((prev) => ({ ...prev, lastName: e.target.value }))}
+                        className="rounded-md border px-3 py-2"
+                      />
+                    </div>
                     <input
                       required
-                      placeholder="First name"
-                      value={form.firstName}
-                      onChange={(e) => setForm((prev) => ({ ...prev, firstName: e.target.value }))}
-                      className="rounded-md border px-3 py-2"
+                      type="email"
+                      placeholder="Email"
+                      value={form.email}
+                      onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                      className="w-full rounded-md border px-3 py-2"
                     />
-                    <input
-                      required
-                      placeholder="Last name"
-                      value={form.lastName}
-                      onChange={(e) => setForm((prev) => ({ ...prev, lastName: e.target.value }))}
-                      className="rounded-md border px-3 py-2"
-                    />
-                  </div>
-                  <input
-                    required
-                    type="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                    className="w-full rounded-md border px-3 py-2"
-                  />
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <input
-                      placeholder="Phone"
-                      value={form.phone}
-                      onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                      className="rounded-md border px-3 py-2"
-                    />
-                    <input
-                      placeholder="Company"
-                      value={form.company}
-                      onChange={(e) => setForm((prev) => ({ ...prev, company: e.target.value }))}
-                      className="rounded-md border px-3 py-2"
-                    />
-                  </div>
-                  {formError && <p className="text-sm text-destructive">{formError}</p>}
-                  <Button type="submit" disabled={submitting || !selected}>
-                    {submitting
-                      ? 'Submitting…'
-                      : selected && Number(selected.price) > 0
-                        ? 'Continue to payment'
-                        : 'Confirm registration'}
-                  </Button>
-                </form>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input
+                        placeholder="Phone"
+                        value={form.phone}
+                        onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
+                        className="rounded-md border px-3 py-2"
+                      />
+                      <input
+                        placeholder="Company"
+                        value={form.company}
+                        onChange={(e) => setForm((prev) => ({ ...prev, company: e.target.value }))}
+                        className="rounded-md border px-3 py-2"
+                      />
+                    </div>
+                    {formError && <p className="text-sm text-destructive">{formError}</p>}
+                    <Button type="submit" disabled={submitting || !selected}>
+                      {submitting
+                        ? 'Submitting…'
+                        : selected && Number(selected.price) > 0
+                          ? 'Continue to payment'
+                          : 'Confirm registration'}
+                    </Button>
+                  </form>
+                )}
               </CardContent>
             </Card>
           </>
