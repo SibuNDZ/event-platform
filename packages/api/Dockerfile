@@ -104,15 +104,17 @@ RUN chown -R nestjs:nodejs /app
 
 USER nestjs
 
-# Environment variables
+# Railway injects PORT at runtime (typically 8080) and routes public
+# traffic to Dockerfile EXPOSE. Those must match — a mismatch yields
+# Railway 502 "Application failed to respond" with x-railway-fallback.
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=8080
 
-EXPOSE 3001
+EXPOSE 8080
 
 # Health check (use PORT env var — Railway overrides it at runtime)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD node -e "const port=process.env.PORT||3001;require('http').get('http://localhost:'+port+'/api/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+  CMD node -e "const port=process.env.PORT||8080;require('http').get('http://localhost:'+port+'/api/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
 # Start the application
 CMD ["node", "dist/main.js"]

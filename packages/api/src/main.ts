@@ -5,7 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import type { Server } from 'http';
 import { AppModule } from './app.module';
+import { bindLegacyExposeProxy } from './core/http/legacy-expose-proxy';
 
 async function bootstrap() {
   console.log('Starting application bootstrap...');
@@ -99,7 +101,11 @@ async function bootstrap() {
   const apiPort = Number.parseInt(apiPortRaw ?? '', 10);
   const resolvedPort = Number.isFinite(port) ? port : Number.isFinite(apiPort) ? apiPort : 4000;
 
+  app.enableShutdownHooks();
   await app.listen(resolvedPort, '0.0.0.0');
+  const legacyProxy = bindLegacyExposeProxy(resolvedPort);
+  const httpServer = app.getHttpServer() as Server;
+  httpServer.on('close', () => legacyProxy?.close());
   console.log(`Application is running on: http://0.0.0.0:${resolvedPort}`);
   console.log(`Swagger documentation: http://0.0.0.0:${resolvedPort}/docs`);
 }

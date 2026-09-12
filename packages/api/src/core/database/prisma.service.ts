@@ -1,15 +1,20 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { PrismaClient } from '@event-platform/database';
+import { applyPrismaConnectionLimit, resolvePrismaConnectionLimit } from './prisma-connection-url';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
+    const datasourceUrl = applyPrismaConnectionLimit(process.env.DATABASE_URL);
     super({
       log: ['query', 'info', 'warn', 'error'],
+      ...(datasourceUrl ? { datasources: { db: { url: datasourceUrl } } } : {}),
     });
-    this.logger.log('PrismaService initialized');
+    this.logger.log(
+      `PrismaService initialized (connection_limit=${resolvePrismaConnectionLimit()})`
+    );
   }
 
   async onModuleInit() {
