@@ -14,9 +14,7 @@ export interface TenantContext {
 export class TenantService {
   private context: TenantContext | null = null;
 
-  constructor(
-    @Inject(REQUEST) private readonly request?: { tenant?: TenantContext } | null
-  ) {}
+  constructor(@Inject(REQUEST) private readonly request?: { tenant?: TenantContext } | null) {}
 
   setContext(context: TenantContext) {
     this.context = context;

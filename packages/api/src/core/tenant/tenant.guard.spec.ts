@@ -19,11 +19,7 @@ class SampleController {
   }
 }
 
-function mockContext(
-  role?: string,
-  handler?: (...args: unknown[]) => unknown,
-  klass?: object,
-) {
+function mockContext(role?: string, handler?: (...args: unknown[]) => unknown, klass?: object) {
   return {
     getHandler: () => handler ?? (() => ({})),
     getClass: () => klass ?? {},
@@ -94,10 +90,12 @@ describe('RolesGuard', () => {
 
     expect(realGuard.canActivate(mockContext('ADMIN', handler, SampleController))).toBe(true);
     expect(() => realGuard.canActivate(mockContext('STAFF', handler, SampleController))).toThrow(
-      ForbiddenException,
+      ForbiddenException
     );
     expect(
-      realGuard.canActivate(mockContext('VIEWER', SampleController.prototype.openToAnyRole, SampleController)),
+      realGuard.canActivate(
+        mockContext('VIEWER', SampleController.prototype.openToAnyRole, SampleController)
+      )
     ).toBe(true);
   });
 });

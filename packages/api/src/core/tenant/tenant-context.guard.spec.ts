@@ -123,10 +123,16 @@ describe('TenantContextGuard HTTP DI', () => {
 
     app = moduleRef.createNestApplication();
     app.setGlobalPrefix('api');
-    app.use((req: Request & { user?: { id: string; organizationId: string } }, _res: Response, next: NextFunction) => {
-      req.user = { id: 'user_1', organizationId: 'org_1' };
-      next();
-    });
+    app.use(
+      (
+        req: Request & { user?: { id: string; organizationId: string } },
+        _res: Response,
+        next: NextFunction
+      ) => {
+        req.user = { id: 'user_1', organizationId: 'org_1' };
+        next();
+      }
+    );
     await app.listen(0, '127.0.0.1');
     baseUrl = await app.getUrl();
   });
