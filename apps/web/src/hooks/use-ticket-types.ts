@@ -23,6 +23,19 @@ export function useCreateTicketType(eventId: string) {
   });
 }
 
+export function useUpdateTicketType(eventId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTicketTypeRequest> }) =>
+      ticketTypesApi.update(eventId, id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ticket-types', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['events', eventId] });
+    },
+  });
+}
+
 export function useDeleteTicketType(eventId: string) {
   const queryClient = useQueryClient();
 
