@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../core/auth/decorators/public.decorator';
 import { RegisterForEventDto } from './dto/registration.dto';
-import { RegistrationService } from './registration.service';
+import { RegistrationOrderResult, RegistrationService } from './registration.service';
 
 @ApiTags('registration')
 @Controller({ version: '1' })
@@ -12,14 +12,17 @@ export class RegistrationController {
   @Post('events/:eventId/register')
   @Public()
   @ApiOperation({ summary: 'Register for an event' })
-  async register(@Param('eventId') eventId: string, @Body() dto: RegisterForEventDto) {
+  async register(
+    @Param('eventId') eventId: string,
+    @Body() dto: RegisterForEventDto
+  ): Promise<RegistrationOrderResult> {
     return this.registrationService.register(eventId, dto);
   }
 
   @Get('orders/:orderId')
   @Public()
   @ApiOperation({ summary: 'Get registration order status' })
-  async getOrder(@Param('orderId') orderId: string) {
+  async getOrder(@Param('orderId') orderId: string): Promise<RegistrationOrderResult> {
     return this.registrationService.getOrderResult(orderId);
   }
 }

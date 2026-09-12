@@ -97,11 +97,7 @@ async function bootstrap() {
   const apiPortRaw = configService.get<string>('API_PORT');
   const port = Number.parseInt(portRaw ?? '', 10);
   const apiPort = Number.parseInt(apiPortRaw ?? '', 10);
-  const resolvedPort = Number.isFinite(port)
-    ? port
-    : Number.isFinite(apiPort)
-      ? apiPort
-      : 4000;
+  const resolvedPort = Number.isFinite(port) ? port : Number.isFinite(apiPort) ? apiPort : 4000;
 
   await app.listen(resolvedPort, '0.0.0.0');
   console.log(`Application is running on: http://0.0.0.0:${resolvedPort}`);

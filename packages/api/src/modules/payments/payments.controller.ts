@@ -1,17 +1,9 @@
-import {
-  Controller,
-  Get,
-  Headers,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Headers, HttpCode, HttpStatus, Param, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { RawBodyRequest } from '@nestjs/common';
 import type { Request } from 'express';
 import { Public } from '../../core/auth/decorators/public.decorator';
+import { RegistrationOrderResult } from '../registration/registration.service';
 import { PaymentsService } from './payments.service';
 
 @ApiTags('payments')
@@ -33,7 +25,7 @@ export class PaymentsController {
   @Get('checkout/:sessionId')
   @Public()
   @ApiOperation({ summary: 'Get Stripe checkout session order status' })
-  async checkoutStatus(@Param('sessionId') sessionId: string) {
+  async checkoutStatus(@Param('sessionId') sessionId: string): Promise<RegistrationOrderResult> {
     return this.paymentsService.getCheckoutStatus(sessionId);
   }
 }

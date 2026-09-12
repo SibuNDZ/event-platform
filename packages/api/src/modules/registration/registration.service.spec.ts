@@ -81,6 +81,7 @@ describe('RegistrationService', () => {
             orderNumber: 'ORD-1',
             organizationId: 'org_1',
           }),
+          update: vi.fn(),
         },
         attendee: {
           upsert: vi.fn().mockResolvedValue({
@@ -117,18 +118,16 @@ describe('RegistrationService', () => {
         },
       ],
     };
-    prisma.order.findUnique
-      .mockResolvedValueOnce(pendingOrder)
-      .mockResolvedValueOnce({
-        ...pendingOrder,
-        status: 'COMPLETED',
-        items: [
-          {
-            ...pendingOrder.items[0],
-            ticket: { id: 'tkt_1', ticketNumber: 'TKT-1', qrCode: 'QR-1' },
-          },
-        ],
-      });
+    prisma.order.findUnique.mockResolvedValueOnce(pendingOrder).mockResolvedValueOnce({
+      ...pendingOrder,
+      status: 'COMPLETED',
+      items: [
+        {
+          ...pendingOrder.items[0],
+          ticket: { id: 'tkt_1', ticketNumber: 'TKT-1', qrCode: 'QR-1' },
+        },
+      ],
+    });
 
     const result = await service.register('evt_1', {
       ticketTypeId: 'tt_1',

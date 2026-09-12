@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   EventStatus,
@@ -23,6 +19,32 @@ export interface FulfillOrderOptions {
   providerPaymentId?: string;
 }
 
+export interface RegistrationOrderResult {
+  status: 'completed' | 'pending' | 'requires_payment';
+  orderId: string;
+  orderNumber: string;
+  orderStatus?: string;
+  checkoutUrl?: string | null;
+  event?: {
+    id: string;
+    name: string;
+    slug: string;
+    startDate: Date;
+    venueName: string | null;
+  };
+  tickets?: Array<{
+    id: string;
+    ticketNumber: string;
+    qrCode: string;
+  } | null>;
+  attendees?: Array<{
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  } | null>;
+}
+
 @Injectable()
 export class RegistrationService {
   constructor(
@@ -33,7 +55,7 @@ export class RegistrationService {
     private readonly configService: ConfigService
   ) {}
 
-  async register(eventId: string, dto: RegisterForEventDto) {
+  async register(eventId: string, dto: RegisterForEventDto): Promise<RegistrationOrderResult> {
     const event = await this.prisma.event.findFirst({
       where: { id: eventId, deletedAt: null },
       include: { ticketTypes: true },
@@ -198,7 +220,10 @@ export class RegistrationService {
     };
   }
 
-  async fulfillOrder(orderId: string, options: FulfillOrderOptions) {
+  async fulfillOrder(
+    orderId: string,
+    options: FulfillOrderOptions
+  ): Promise<RegistrationOrderResult> {
     const existing = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -233,7 +258,10 @@ export class RegistrationService {
 
     await this.prisma.$transaction(async (tx) => {
       const ticketType = await tx.ticketType.findUnique({ where: { id: ticketTypeId } });
-      if (ticketType?.quantity != null && ticketType.quantitySold + quantity > ticketType.quantity) {
+      if (
+        ticketType?.quantity != null &&
+        ticketType.quantitySold + quantity > ticketType.quantity
+      ) {
         throw new BadRequestException('Not enough tickets available');
       }
 
@@ -289,40 +317,40 @@ export class RegistrationService {
       metadata: { eventId: existing.eventId },
     });
 
-    for (const item of result.items) {
-      if (item.attendee) {
-        this.eventEmitter.emit({
-          organizationId: existing.organizationId,
-          eventType: WEBHOOK_EVENTS.ATTENDEE_CREATED,
-          data: {
-            attendeeId: item.attendee.id,
-            email: item.attendee.email,
-            eventId: existing.eventId,
-          },
-          metadata: { eventId: existing.eventId },
-        });
-      }
-      if (item.ticket) {
-        this.eventEmitter.emit({
-          organizationId: existing.organizationId,
-          eventType: WEBHOOK_EVENTS.TICKET_CREATED,
-          data: {
-            ticketId: item.ticket.id,
-            ticketNumber: item.ticket.ticketNumber,
-            qrCode: item.ticket.qrCode,
-          },
-          metadata: { eventId: existing.eventId },
-        });
-      }
+    for (const attendee of result.attendees || []) {
+      if (!attendee) continue;
+      this.eventEmitter.emit({
+        organizationId: existing.organizationId,
+        eventType: WEBHOOK_EVENTS.ATTENDEE_CREATED,
+        data: {
+          attendeeId: attendee.id,
+          email: attendee.email,
+          eventId: existing.eventId,
+        },
+        metadata: { eventId: existing.eventId },
+      });
+    }
+    for (const ticket of result.tickets || []) {
+      if (!ticket) continue;
+      this.eventEmitter.emit({
+        organizationId: existing.organizationId,
+        eventType: WEBHOOK_EVENTS.TICKET_CREATED,
+        data: {
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticketNumber,
+          qrCode: ticket.qrCode,
+        },
+        metadata: { eventId: existing.eventId },
+      });
     }
 
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000');
     await Promise.all(
-      result.items
-        .filter((item) => item.attendee && item.ticket)
-        .map((item) =>
+      (result.attendees || [])
+        .filter((attendee): attendee is NonNullable<typeof attendee> => Boolean(attendee))
+        .map((attendee) =>
           this.emailService.sendConfirmationEmail(
-            item.attendee!.email,
+            attendee.email,
             existing.event.name,
             `${frontendUrl}/e/${existing.event.slug}/confirmed?orderId=${existing.id}`
           )
@@ -332,7 +360,7 @@ export class RegistrationService {
     return result;
   }
 
-  async getOrderResult(orderId: string) {
+  async getOrderResult(orderId: string): Promise<RegistrationOrderResult> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -360,14 +388,29 @@ export class RegistrationService {
     }
 
     return {
-      status: order.status === OrderStatus.COMPLETED ? ('completed' as const) : ('pending' as const),
+      status:
+        order.status === OrderStatus.COMPLETED ? ('completed' as const) : ('pending' as const),
       orderId: order.id,
       orderNumber: order.orderNumber,
       orderStatus: order.status,
       event: order.event,
-      items: order.items,
-      tickets: order.items.map((item) => item.ticket).filter(Boolean),
-      attendees: order.items.map((item) => item.attendee).filter(Boolean),
+      tickets: order.items
+        .map((item) => item.ticket)
+        .filter(Boolean)
+        .map((ticket) => ({
+          id: ticket!.id,
+          ticketNumber: ticket!.ticketNumber,
+          qrCode: ticket!.qrCode,
+        })),
+      attendees: order.items
+        .map((item) => item.attendee)
+        .filter(Boolean)
+        .map((attendee) => ({
+          id: attendee!.id,
+          email: attendee!.email,
+          firstName: attendee!.firstName,
+          lastName: attendee!.lastName,
+        })),
     };
   }
 

@@ -11,7 +11,10 @@ export class AttendeesService {
     private readonly tenantService: TenantService
   ) {}
 
-  async findByEvent(eventId: string, query: { page?: number; perPage?: number; search?: string } = {}) {
+  async findByEvent(
+    eventId: string,
+    query: { page?: number; perPage?: number; search?: string } = {}
+  ) {
     await this.verifyEventAccess(eventId);
 
     const { page = 1, perPage = 50, search } = query;

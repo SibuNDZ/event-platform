@@ -60,4 +60,3 @@ export class StripeService {
     return this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
   }
 }
-

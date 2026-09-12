@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PaymentProvider } from '@event-platform/database';
 import type Stripe from 'stripe';
-import { RegistrationService } from '../registration/registration.service';
+import { RegistrationOrderResult, RegistrationService } from '../registration/registration.service';
 import { StripeService } from './stripe.service';
 
 @Injectable()
@@ -47,7 +47,7 @@ export class PaymentsService {
     return { received: true, type: event.type };
   }
 
-  async getCheckoutStatus(sessionId: string) {
+  async getCheckoutStatus(sessionId: string): Promise<RegistrationOrderResult> {
     const session = await this.stripeService.retrieveCheckoutSession(sessionId);
     const orderId = session.metadata?.orderId;
     if (!orderId) {

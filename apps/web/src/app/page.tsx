@@ -79,9 +79,8 @@ export default function Home() {
       slug: 'enterprise',
       features: [
         'Everything in Professional',
-        'Unlimited attendees',
+        'Unlimited events and attendees',
         'SSO and custom domains (planned)',
-        'Unlimited attendees',
         'Webhook and API access',
         'Talk to us for rollout help',
       ],

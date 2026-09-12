@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { TableRowSkeleton } from '@/components/ui/loading-skeleton';
@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 export default function AttendeesPage() {
   const { data: eventsData, isLoading: eventsLoading } = useEvents({ perPage: 100 });
   const [selectedEventId, setSelectedEventId] = useState<string>('');
-  const events = eventsData?.items || [];
+  const events = useMemo(() => eventsData?.items || [], [eventsData?.items]);
 
   const { data: attendeesData, isLoading: attendeesLoading } = useAttendees(selectedEventId, {
     perPage: 50,
