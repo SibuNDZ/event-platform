@@ -9,3 +9,5 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
+# Public networking must target the same port the process listens on
+# (Railway PORT, typically 8080). Dockerfile EXPOSE is 8080.
