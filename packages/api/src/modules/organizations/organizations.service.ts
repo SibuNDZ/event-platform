@@ -27,7 +27,15 @@ export class OrganizationsService {
     return org;
   }
 
-  async update(data: Record<string, unknown>): Promise<Organization> {
+  async update(data: {
+    name?: string;
+    logoUrl?: string;
+    website?: string;
+    websiteUrl?: string;
+    timezone?: string;
+    currency?: string;
+    locale?: string;
+  }): Promise<Organization> {
     const organizationId = this.tenantService.getOrganizationId();
     if (!organizationId) {
       throw new ForbiddenException('Organization context required');
@@ -35,7 +43,15 @@ export class OrganizationsService {
 
     return this.prisma.organization.update({
       where: { id: organizationId },
-      data: data as Parameters<typeof this.prisma.organization.update>[0]['data'],
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl }),
+        ...(data.websiteUrl !== undefined && { websiteUrl: data.websiteUrl }),
+        ...(data.website !== undefined && { websiteUrl: data.website }),
+        ...(data.timezone !== undefined && { timezone: data.timezone }),
+        ...(data.currency !== undefined && { currency: data.currency }),
+        ...(data.locale !== undefined && { locale: data.locale }),
+      },
     });
   }
 

@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/tenant/tenant.guard';
 import { Roles } from '../../core/tenant/tenant.decorator';
 import { TicketType } from '@event-platform/database';
+import { CreateTicketTypeDto, UpdateTicketTypeDto } from './dto/ticket-type.dto';
 
 @ApiTags('ticket-types')
 @Controller({ path: 'events/:eventId/ticket-types', version: '1' })
@@ -27,7 +28,10 @@ export class TicketTypesController {
   @Post()
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create ticket type' })
-  async create(@Param('eventId') eventId: string, @Body() dto: any): Promise<TicketType> {
+  async create(
+    @Param('eventId') eventId: string,
+    @Body() dto: CreateTicketTypeDto
+  ): Promise<TicketType> {
     return this.ticketTypesService.create(eventId, dto);
   }
 
@@ -41,22 +45,26 @@ export class TicketTypesController {
   @Get(':id')
   @Roles('VIEWER')
   @ApiOperation({ summary: 'Get ticket type by ID' })
-  async findOne(@Param('id') id: string): Promise<TicketType> {
-    return this.ticketTypesService.findOne(id);
+  async findOne(@Param('eventId') eventId: string, @Param('id') id: string): Promise<TicketType> {
+    return this.ticketTypesService.findOne(eventId, id);
   }
 
   @Put(':id')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Update ticket type' })
-  async update(@Param('id') id: string, @Body() dto: any): Promise<TicketType> {
-    return this.ticketTypesService.update(id, dto);
+  async update(
+    @Param('eventId') eventId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateTicketTypeDto
+  ): Promise<TicketType> {
+    return this.ticketTypesService.update(eventId, id, dto);
   }
 
   @Delete(':id')
   @Roles('ADMIN')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete ticket type' })
-  async delete(@Param('id') id: string): Promise<void> {
-    await this.ticketTypesService.delete(id);
+  async delete(@Param('eventId') eventId: string, @Param('id') id: string): Promise<void> {
+    await this.ticketTypesService.delete(eventId, id);
   }
 }

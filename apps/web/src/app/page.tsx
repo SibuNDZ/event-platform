@@ -4,44 +4,43 @@ import { Button } from '@/components/ui/button';
 export default function Home() {
   const highlights = [
     {
-      title: 'Registration that converts',
-      description:
-        'Dynamic forms, discount logic, and multi-currency checkout tuned for high conversion.',
+      title: 'Create and publish events',
+      description: 'Set dates, venue, and ticket types, then publish a public registration page.',
     },
     {
-      title: 'Zero-friction check-in',
-      description: 'QR scanning, offline mode, and session access control keep lines moving.',
+      title: 'Registration that works',
+      description: 'Free tickets confirm immediately. Paid tickets use Stripe Checkout when configured.',
     },
     {
-      title: 'Real-time intelligence',
-      description: 'Live dashboards for attendance, revenue, and engagement across every event.',
+      title: 'QR check-in',
+      description: 'Attendees get a ticket code. Staff paste it into the organizer check-in screen.',
     },
     {
-      title: 'Trusted integrations',
-      description: 'Stripe, Resend, S3, webhooks, and API keys for the rest of your stack.',
+      title: 'Organizer dashboard',
+      description: 'See events, attendees, and registration counts for the workspace you signed up with.',
     },
     {
-      title: 'Enterprise controls',
-      description: 'Multi-tenant roles, audit logs, and tiered licensing from day one.',
+      title: 'Team roles',
+      description: 'Owner, admin, staff, and viewer roles apply to event, attendee, and check-in actions.',
     },
     {
-      title: 'Scale without surprises',
-      description: 'Queue-backed processing and Redis caching keep latency low under load.',
+      title: 'Optional Stripe and email',
+      description: 'Add STRIPE_SECRET_KEY for paid tickets and RESEND_API_KEY for confirmation emails.',
     },
   ];
 
   const steps = [
     {
-      title: 'Launch in days',
-      description: 'Create your organization, add team roles, and publish your first event.',
+      title: 'Create a workspace',
+      description: 'Register an organization, then create your first event from the dashboard.',
     },
     {
-      title: 'Customize every touchpoint',
-      description: 'Brand the attendee flow, ticketing, emails, and check-in experience.',
+      title: 'Add tickets and publish',
+      description: 'Create a free or paid ticket type and publish the public /e/[slug] page.',
     },
     {
-      title: 'Operate in real time',
-      description: 'Track attendance, manage sessions, and sync ops from a single dashboard.',
+      title: 'Register and check in',
+      description: 'Attendees register online. Staff check them in with the ticket QR code.',
     },
   ];
 
@@ -52,10 +51,10 @@ export default function Home() {
       period: '/year',
       slug: 'standard',
       features: [
-        'Up to 12 events/year',
-        'Up to 500 attendees/event',
-        'Registration & check-in',
-        'Basic analytics',
+        'Up to 10 events',
+        'Up to 1,000 attendees/event',
+        'Registration and QR check-in',
+        'Event attendee lists',
         'Email support',
       ],
     },
@@ -66,11 +65,10 @@ export default function Home() {
       slug: 'professional',
       popular: true,
       features: [
-        'Unlimited events',
-        'Up to 2,500 attendees/event',
-        'Virtual + hybrid events',
-        'Advanced analytics',
-        'Custom branding',
+        'Up to 50 events',
+        'Up to 5,000 attendees/event',
+        'Virtual and hybrid event types',
+        'Registration analytics',
         'Priority support',
       ],
     },
@@ -81,11 +79,10 @@ export default function Home() {
       slug: 'enterprise',
       features: [
         'Everything in Professional',
-        'Unlimited attendees',
-        'SSO & custom domains',
-        'Dedicated success',
-        'Custom integrations',
-        'SLA guarantee',
+        'Unlimited events and attendees',
+        'SSO and custom domains (planned)',
+        'Webhook and API access',
+        'Talk to us for rollout help',
       ],
     },
   ];
@@ -126,14 +123,14 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-2 text-sm text-muted-foreground">
                   <span className="inline-flex h-2 w-2 rounded-full bg-accent animate-shimmer" />
-                  Launch, operate, and scale every event in one place
+                  Create events, take registrations, and check people in
                 </div>
                 <h1 className="mt-6 text-5xl lg:text-6xl font-semibold text-balance">
-                  Event operations that feel effortless — even at enterprise scale.
+                  A working event workspace for registration and door check-in.
                 </h1>
                 <p className="mt-6 text-lg text-muted-foreground text-balance">
-                  Vibrant Events brings registration, payments, communications, and on-site
-                  execution into a single, real-time system built for modern teams.
+                  Create an organization, publish an event, sell or give away tickets, and
+                  check attendees in with a QR code. Stripe and email are optional extras.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   <Link href="/register">
@@ -147,7 +144,7 @@ export default function Home() {
                     </Button>
                   </Link>
                   <div className="text-sm text-muted-foreground">
-                    No credit card required · Launch in minutes
+                    No credit card required · Free tickets work without Stripe
                   </div>
                 </div>
               </div>
@@ -155,19 +152,19 @@ export default function Home() {
               <div className="glass-panel rounded-3xl p-6 shadow-2xl shadow-black/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Live event pulse</p>
-                    <p className="text-2xl font-semibold">Summit Series 2026</p>
+                    <p className="text-sm text-muted-foreground">What you can do today</p>
+                    <p className="text-2xl font-semibold">Organizer workflow</p>
                   </div>
                   <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                    Live
+                    Preview
                   </span>
                 </div>
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Registrations', value: '4,280' },
-                    { label: 'Check-ins', value: '3,912' },
-                    { label: 'Conversion', value: '78.4%' },
-                    { label: 'Revenue', value: 'R8.7M' },
+                    { label: 'Create event', value: 'Ready' },
+                    { label: 'Ticket types', value: 'Ready' },
+                    { label: 'Public register', value: 'Ready' },
+                    { label: 'QR check-in', value: 'Ready' },
                   ].map((stat) => (
                     <div
                       key={stat.label}
@@ -179,12 +176,12 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="mt-6 rounded-2xl bg-foreground/5 p-4">
-                  <p className="text-sm text-muted-foreground">Next session</p>
+                  <p className="text-sm text-muted-foreground">Path</p>
                   <p className="text-base font-semibold">
-                    Building resilient event pipelines · 3:30 PM
+                    Sign up → create event → publish → register → check in
                   </p>
                   <div className="mt-3 h-2 w-full rounded-full bg-muted">
-                    <div className="h-2 w-2/3 rounded-full bg-primary" />
+                    <div className="h-2 w-full rounded-full bg-primary" />
                   </div>
                 </div>
               </div>
@@ -200,11 +197,10 @@ export default function Home() {
                 Built for modern teams
               </span>
               <h2 className="mt-4 text-4xl font-semibold text-balance">
-                Everything you need to plan, sell, and run flawless events.
+                The core loop is live. Extra modules stay off the marketing page until they ship.
               </h2>
               <p className="mt-4 text-muted-foreground max-w-2xl">
-                From registration to post-event analytics, every module is connected to keep your
-                data, teams, and attendees aligned.
+                Sessions, CRM sync, SSO, badges, and campaign email are not part of this release.
               </p>
             </div>
             <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -249,7 +245,7 @@ export default function Home() {
             <div className="text-center">
               <h2 className="text-4xl font-semibold">Simple, transparent pricing</h2>
               <p className="mt-4 text-muted-foreground">
-                Upgrade when you are ready — every plan includes full access to the core platform.
+                Plan limits match the license tiers in the product. Paid checkout needs Stripe.
               </p>
             </div>
             <div className="mt-12 grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
@@ -293,11 +289,10 @@ export default function Home() {
           <div className="container mx-auto">
             <div className="rounded-3xl border border-border bg-foreground/5 p-10 text-center">
               <h2 className="text-3xl font-semibold text-balance">
-                Ready to modernize your event operations?
+                Ready to run your next registration?
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Launch a demo workspace or talk to our team about migration, integrations, and
-                rollout plans.
+                Create a workspace now, or send a demo request if you want a walkthrough.
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-4">
                 <Link href="/register">

@@ -6,11 +6,13 @@ import { StatsCardSkeleton, CardSkeleton } from '@/components/ui/loading-skeleto
 import { useEvents } from '@/hooks/use-events';
 
 export default function AnalyticsPage() {
-  const { data, isLoading, error } = useEvents({ limit: 100 });
+  const { data, isLoading, error } = useEvents({ perPage: 100 });
+  const events = data?.items || [];
 
-  const totalEvents = data?.total || 0;
-  const publishedEvents = data?.events?.filter((e) => e.status === 'PUBLISHED').length || 0;
-  const totalAttendees = data?.events?.reduce((acc, e) => acc + (e._count?.attendees || 0), 0) || 0;
+  const totalEvents = data?.meta.total || 0;
+  const publishedEvents = events.filter((e) => e.status === 'PUBLISHED').length || 0;
+  const totalAttendees =
+    events.reduce((acc, e) => acc + (e.attendeeCount ?? e._count?.attendees ?? 0), 0) || 0;
 
   const metrics = [
     { name: 'Total Events', value: totalEvents.toString(), change: 'All time' },
@@ -28,8 +30,12 @@ export default function AnalyticsPage() {
   ];
 
   // Sort events by attendee count for top performers
-  const topEvents = [...(data?.events || [])]
-    .sort((a, b) => (b._count?.attendees || 0) - (a._count?.attendees || 0))
+  const topEvents = [...events]
+    .sort(
+      (a, b) =>
+        (b.attendeeCount ?? b._count?.attendees ?? 0) -
+        (a.attendeeCount ?? a._count?.attendees ?? 0)
+    )
     .slice(0, 5);
 
   if (error) {
@@ -90,7 +96,7 @@ export default function AnalyticsPage() {
             <CardSkeleton />
             <CardSkeleton />
           </>
-        ) : !data?.events?.length ? (
+        ) : events.length === 0 ? (
           <Card className="lg:col-span-2">
             <EmptyState
               icon="chart"
@@ -134,7 +140,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-medium">
-                            {(event._count?.attendees || 0).toLocaleString()}
+                            {(event.attendeeCount ?? event._count?.attendees ?? 0).toLocaleString()}
                           </p>
                           <p className="text-sm text-muted-foreground">registrations</p>
                         </div>
@@ -155,22 +161,22 @@ export default function AnalyticsPage() {
                   {[
                     {
                       status: 'Published',
-                      count: data.events.filter((e) => e.status === 'PUBLISHED').length,
+                      count: events.filter((e) => e.status === 'PUBLISHED').length,
                       color: 'bg-green-500',
                     },
                     {
                       status: 'Draft',
-                      count: data.events.filter((e) => e.status === 'DRAFT').length,
+                      count: events.filter((e) => e.status === 'DRAFT').length,
                       color: 'bg-yellow-500',
                     },
                     {
                       status: 'Completed',
-                      count: data.events.filter((e) => e.status === 'COMPLETED').length,
+                      count: events.filter((e) => e.status === 'COMPLETED').length,
                       color: 'bg-blue-500',
                     },
                     {
                       status: 'Cancelled',
-                      count: data.events.filter((e) => e.status === 'CANCELLED').length,
+                      count: events.filter((e) => e.status === 'CANCELLED').length,
                       color: 'bg-red-500',
                     },
                   ].map((item) => {

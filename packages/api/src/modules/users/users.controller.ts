@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../core/auth/decorators/current-user.decorator';
 import { User } from '@event-platform/database';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('users')
 @Controller({ path: 'users', version: '1' })
@@ -20,7 +21,7 @@ export class UsersController {
 
   @Put('me')
   @ApiOperation({ summary: 'Update current user profile' })
-  async updateProfile(@CurrentUser() user: User, @Body() dto: any) {
+  async updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
     return this.usersService.update(user.id, dto);
   }
 }

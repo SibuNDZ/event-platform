@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { eventsApi, EventQueryParams, CreateEventRequest } from '@/lib/api/events';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CreateEventRequest, EventQueryParams, eventsApi } from '@/lib/api/events';
 
 export function useEvents(params?: EventQueryParams) {
   return useQuery({
@@ -15,6 +15,14 @@ export function useEvent(id: string) {
     queryKey: ['events', id],
     queryFn: () => eventsApi.getById(id),
     enabled: !!id,
+  });
+}
+
+export function usePublicEvent(slug: string) {
+  return useQuery({
+    queryKey: ['events', 'public', slug],
+    queryFn: () => eventsApi.getPublicBySlug(slug),
+    enabled: !!slug,
   });
 }
 
@@ -66,6 +74,18 @@ export function usePublishEvent() {
 
   return useMutation({
     mutationFn: (id: string) => eventsApi.publish(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['events', id] });
+    },
+  });
+}
+
+export function useUnpublishEvent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => eventsApi.unpublish(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['events', id] });

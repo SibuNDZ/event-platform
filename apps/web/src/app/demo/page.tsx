@@ -16,16 +16,29 @@ export default function DemoPage() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitted(true);
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/v1/marketing/demo-leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.message || 'Could not send demo request');
+      }
+      setIsSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send demo request');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (
@@ -322,6 +335,8 @@ export default function DemoPage() {
                     placeholder="What types of events do you host? Any specific features you're looking for?"
                   />
                 </div>
+
+                {error && <p className="text-sm text-destructive">{error}</p>}
 
                 <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                   {isLoading ? 'Submitting...' : 'Request Demo'}

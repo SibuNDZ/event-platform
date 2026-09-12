@@ -20,6 +20,7 @@ export interface OrganizationDetails {
   slug: string;
   logoUrl?: string;
   website?: string;
+  websiteUrl?: string;
   description?: string;
   licenseTier: string;
   createdAt: string;

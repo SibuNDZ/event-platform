@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/tenant/tenant.guard';
 import { Roles } from '../../core/tenant/tenant.decorator';
 import { Attendee } from '@event-platform/database';
+import { UpdateAttendeeDto } from './dto/attendee.dto';
 
 @ApiTags('attendees')
 @Controller({ path: 'events/:eventId/attendees', version: '1' })
@@ -23,14 +24,18 @@ export class AttendeesController {
   @Get(':id')
   @Roles('STAFF')
   @ApiOperation({ summary: 'Get attendee by ID' })
-  async findOne(@Param('id') id: string): Promise<Attendee> {
-    return this.attendeesService.findOne(id);
+  async findOne(@Param('eventId') eventId: string, @Param('id') id: string): Promise<Attendee> {
+    return this.attendeesService.findOne(eventId, id);
   }
 
   @Put(':id')
   @Roles('STAFF')
   @ApiOperation({ summary: 'Update attendee' })
-  async update(@Param('id') id: string, @Body() dto: any): Promise<Attendee> {
-    return this.attendeesService.update(id, dto);
+  async update(
+    @Param('eventId') eventId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateAttendeeDto
+  ): Promise<Attendee> {
+    return this.attendeesService.update(eventId, id, dto);
   }
 }

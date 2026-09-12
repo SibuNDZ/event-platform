@@ -29,7 +29,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="flex h-16 items-center px-6 border-b">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg" />
-            <span className="text-lg font-bold">EventPlatform</span>
+            <span className="text-lg font-bold">Vibrant Events</span>
           </Link>
         </div>
         <nav className="p-4 space-y-1">

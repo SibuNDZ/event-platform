@@ -5,32 +5,59 @@ export interface Event {
   name: string;
   slug: string;
   description?: string;
+  shortDescription?: string;
+  type: 'IN_PERSON' | 'VIRTUAL' | 'HYBRID';
+  status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
   startDate: string;
   endDate: string;
   timezone: string;
-  venue?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  isVirtual: boolean;
-  virtualUrl?: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
-  coverImage?: string;
-  maxAttendees?: number;
+  venueName?: string | null;
+  venueAddress?: string | null;
+  venueCity?: string | null;
+  venueCountry?: string | null;
+  currency?: string;
+  coverImageUrl?: string | null;
+  maxAttendees?: number | null;
+  isPublic?: boolean;
   organizationId: string;
+  attendeeCount?: number;
+  orderCount?: number;
   createdAt: string;
   updatedAt: string;
   _count?: {
     attendees: number;
-    ticketTypes: number;
+    ticketTypes?: number;
+    orders?: number;
+  };
+  ticketTypes?: PublicTicketType[];
+  organization?: {
+    name: string;
+    slug: string;
+    logoUrl?: string | null;
   };
 }
 
+export interface PublicTicketType {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: string | number;
+  currency: string;
+  quantity?: number | null;
+  quantitySold: number;
+  maxPerOrder: number;
+  minPerOrder: number;
+  isVisible: boolean;
+}
+
 export interface EventsResponse {
-  events: Event[];
-  total: number;
-  page: number;
-  limit: number;
+  items: Event[];
+  meta: {
+    page: number;
+    perPage: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface EventStats {
@@ -42,22 +69,25 @@ export interface EventStats {
 
 export interface CreateEventRequest {
   name: string;
+  slug?: string;
   description?: string;
+  shortDescription?: string;
+  type?: Event['type'];
   startDate: string;
   endDate: string;
-  timezone: string;
-  venue?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  isVirtual?: boolean;
-  virtualUrl?: string;
+  timezone?: string;
+  venueName?: string;
+  venueAddress?: string;
+  venueCity?: string;
+  venueCountry?: string;
+  currency?: string;
   maxAttendees?: number;
+  isPublic?: boolean;
 }
 
 export interface EventQueryParams {
   page?: number;
-  limit?: number;
+  perPage?: number;
   status?: string;
   search?: string;
 }
@@ -66,7 +96,7 @@ export const eventsApi = {
   getAll: (params?: EventQueryParams) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.perPage) searchParams.set('perPage', params.perPage.toString());
     if (params?.status) searchParams.set('status', params.status);
     if (params?.search) searchParams.set('search', params.search);
     const query = searchParams.toString();
@@ -74,6 +104,8 @@ export const eventsApi = {
   },
 
   getById: (id: string) => api.get<Event>(`/events/${id}`),
+
+  getPublicBySlug: (slug: string) => api.get<Event>(`/events/public/${slug}`, { skipAuth: true }),
 
   create: (data: CreateEventRequest) => api.post<Event>('/events', data),
 
