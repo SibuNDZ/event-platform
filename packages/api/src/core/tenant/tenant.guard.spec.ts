@@ -46,12 +46,12 @@ describe('RolesGuard', () => {
     getAllAndOverride: vi.fn(),
   };
 
-  const createContext = (tenant?: { role?: string }) =>
+  const createContext = (tenant?: { role?: string }, user?: { role?: string }) =>
     ({
       getHandler: () => ({}),
       getClass: () => ({}),
       switchToHttp: () => ({
-        getRequest: () => ({ tenant }),
+        getRequest: () => ({ tenant, user }),
       }),
     }) as never;
 
@@ -73,6 +73,12 @@ describe('RolesGuard', () => {
     reflector.getAllAndOverride.mockReturnValue(['ADMIN']);
 
     expect(() => guard.canActivate(createContext())).toThrow(ForbiddenException);
+  });
+
+  it('falls back to the JWT user role when tenant context is missing', () => {
+    reflector.getAllAndOverride.mockReturnValue(['ADMIN']);
+
+    expect(guard.canActivate(createContext(undefined, { role: 'OWNER' }))).toBe(true);
   });
 
   it('rejects a role below the required level', () => {

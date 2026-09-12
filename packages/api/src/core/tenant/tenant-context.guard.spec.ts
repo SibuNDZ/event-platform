@@ -1,11 +1,13 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { describe, expect, it, vi } from 'vitest';
+import 'reflect-metadata';
+import { Controller, Get, INestApplication, Req, UnauthorizedException } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { Test } from '@nestjs/testing';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { NextFunction, Request, Response } from 'express';
+import { PrismaService } from '../database/prisma.service';
 import { TenantContextGuard } from './tenant-context.guard';
 
 describe('TenantContextGuard', () => {
-  const tenantService = {
-    setContext: vi.fn(),
-  };
   const prisma = {
     organization: {
       findUnique: vi.fn(),
@@ -22,11 +24,10 @@ describe('TenantContextGuard', () => {
       }),
     }) as never;
 
-  const guard = new TenantContextGuard(tenantService as never, prisma as never);
+  const guard = new TenantContextGuard(prisma as never);
 
   it('allows public requests without a user', async () => {
     await expect(guard.canActivate(createContext())).resolves.toBe(true);
-    expect(tenantService.setContext).not.toHaveBeenCalled();
   });
 
   it('hydrates tenant context from user.id', async () => {
@@ -50,13 +51,12 @@ describe('TenantContextGuard', () => {
         },
       },
     });
-    expect(tenantService.setContext).toHaveBeenCalledWith({
+    expect(request).toHaveProperty('tenant', {
       organizationId: 'org_1',
       organization: { id: 'org_1', deletedAt: null },
       userId: 'user_1',
       role: 'OWNER',
     });
-    expect(request).toHaveProperty('tenant.userId', 'user_1');
   });
 
   it('falls back to user.sub when id is missing', async () => {
@@ -89,5 +89,56 @@ describe('TenantContextGuard', () => {
     await expect(
       guard.canActivate(createContext({ id: 'user_1', organizationId: 'org_1' }))
     ).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+});
+
+@Controller()
+class TenantProbeController {
+  @Get('me')
+  me(@Req() request: { tenant?: { organizationId?: string } }) {
+    return { organizationId: request.tenant?.organizationId ?? null };
+  }
+}
+
+describe('TenantContextGuard HTTP DI', () => {
+  let app: INestApplication;
+  let baseUrl: string;
+  const prisma = {
+    organization: {
+      findUnique: vi.fn().mockResolvedValue({ id: 'org_1', deletedAt: null }),
+    },
+    organizationMember: {
+      findUnique: vi.fn().mockResolvedValue({ role: 'OWNER' }),
+    },
+  };
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      controllers: [TenantProbeController],
+      providers: [
+        { provide: PrismaService, useValue: prisma },
+        { provide: APP_GUARD, useClass: TenantContextGuard },
+      ],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+    app.setGlobalPrefix('api');
+    app.use((req: Request & { user?: { id: string; organizationId: string } }, _res: Response, next: NextFunction) => {
+      req.user = { id: 'user_1', organizationId: 'org_1' };
+      next();
+    });
+    await app.listen(0, '127.0.0.1');
+    baseUrl = await app.getUrl();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('injects PrismaService when registered as a global APP_GUARD', async () => {
+    const response = await fetch(`${baseUrl}/api/me`);
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ organizationId: 'org_1' });
+    expect(prisma.organization.findUnique).toHaveBeenCalled();
   });
 });

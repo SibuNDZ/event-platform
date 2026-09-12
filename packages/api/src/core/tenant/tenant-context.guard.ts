@@ -1,6 +1,6 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { TenantService } from './tenant.service';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
+import { TenantContext } from './tenant.service';
 
 type AuthUser = {
   id?: string;
@@ -10,14 +10,14 @@ type AuthUser = {
 
 @Injectable()
 export class TenantContextGuard implements CanActivate {
-  constructor(
-    private readonly tenantService: TenantService,
-    private readonly prisma: PrismaService
-  ) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const user = request.user as AuthUser | undefined;
+    const request = context.switchToHttp().getRequest<{
+      user?: AuthUser;
+      tenant?: TenantContext;
+    }>();
+    const user = request.user;
 
     if (!user) {
       return true;
@@ -51,15 +51,9 @@ export class TenantContextGuard implements CanActivate {
       throw new UnauthorizedException('User is not a member of this organization');
     }
 
-    this.tenantService.setContext({
-      organizationId: organization.id,
-      organization,
-      userId,
-      role: membership.role,
-    });
-
     request.tenant = {
       organizationId: organization.id,
+      organization,
       userId,
       role: membership.role,
     };

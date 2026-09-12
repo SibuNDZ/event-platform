@@ -19,8 +19,11 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<{ tenant?: { role?: string } }>();
-    const role = request.tenant?.role;
+    const request = context.switchToHttp().getRequest<{
+      tenant?: { role?: string };
+      user?: { role?: string };
+    }>();
+    const role = request.tenant?.role || request.user?.role;
     if (!role) {
       throw new ForbiddenException('No role assigned');
     }
