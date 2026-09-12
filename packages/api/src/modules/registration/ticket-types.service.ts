@@ -3,6 +3,7 @@ import { TicketType } from '@event-platform/database';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
 import { CreateTicketTypeDto, UpdateTicketTypeDto } from './dto/ticket-type.dto';
+import { normalizeCurrency } from '../../common/currency';
 
 @Injectable()
 export class TicketTypesService {
@@ -20,7 +21,7 @@ export class TicketTypesService {
         name: dto.name,
         description: dto.description,
         price: dto.price,
-        currency: dto.currency || event.currency || 'ZAR',
+        currency: normalizeCurrency(dto.currency) || normalizeCurrency(event.currency) || 'ZAR',
         quantity: dto.quantity,
         maxPerOrder: dto.maxPerOrder ?? 10,
         minPerOrder: dto.minPerOrder ?? 1,
@@ -66,7 +67,7 @@ export class TicketTypesService {
         ...(dto.name !== undefined && { name: dto.name }),
         ...(dto.description !== undefined && { description: dto.description }),
         ...(dto.price !== undefined && { price: dto.price }),
-        ...(dto.currency !== undefined && { currency: dto.currency }),
+        ...(dto.currency !== undefined && { currency: normalizeCurrency(dto.currency) }),
         ...(dto.quantity !== undefined && { quantity: dto.quantity }),
         ...(dto.maxPerOrder !== undefined && { maxPerOrder: dto.maxPerOrder }),
         ...(dto.minPerOrder !== undefined && { minPerOrder: dto.minPerOrder }),

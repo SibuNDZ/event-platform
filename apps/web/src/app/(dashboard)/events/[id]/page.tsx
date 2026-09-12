@@ -11,6 +11,7 @@ import { useEvent, usePublishEvent, useUnpublishEvent, useUpdateEvent } from '@/
 import { useCreateTicketType, useDeleteTicketType, useTicketTypes } from '@/hooks/use-ticket-types';
 import { toast } from '@/components/ui/use-toast';
 import { ApiClientError } from '@/lib/api/client';
+import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
 
 function money(value: string | number, currency = 'ZAR') {
   return `${currency} ${Number(value).toLocaleString()}`;
@@ -33,6 +34,7 @@ export default function EventDetailPage() {
     description: '',
     venueName: '',
     venueCity: '',
+    currency: 'ZAR',
   });
   const [ticketForm, setTicketForm] = useState({
     name: 'General Admission',
@@ -47,6 +49,7 @@ export default function EventDetailPage() {
       description: event.description || '',
       venueName: event.venueName || '',
       venueCity: event.venueCity || '',
+      currency: event.currency || 'ZAR',
     });
     setEditing(true);
   };
@@ -60,6 +63,7 @@ export default function EventDetailPage() {
           description: form.description || undefined,
           venueName: form.venueName || undefined,
           venueCity: form.venueCity || undefined,
+          currency: form.currency,
         },
       });
       setEditing(false);
@@ -138,7 +142,10 @@ export default function EventDetailPage() {
           <Button variant="outline" onClick={editing ? saveEvent : startEdit}>
             {editing ? 'Save changes' : 'Edit'}
           </Button>
-          <Button onClick={togglePublish} disabled={publishEvent.isPending || unpublishEvent.isPending}>
+          <Button
+            onClick={togglePublish}
+            disabled={publishEvent.isPending || unpublishEvent.isPending}
+          >
             {event.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
           </Button>
           <Link href={`/events/${event.id}/check-in`}>
@@ -208,13 +215,34 @@ export default function EventDetailPage() {
                   className="rounded-md border px-3 py-2"
                 />
               </div>
+              <div>
+                <label htmlFor="event-currency" className="text-sm font-medium">
+                  Currency
+                </label>
+                <select
+                  id="event-currency"
+                  value={form.currency}
+                  onChange={(e) => setForm((prev) => ({ ...prev, currency: e.target.value }))}
+                  className="mt-1 w-full rounded-md border px-3 py-2"
+                >
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Changing the currency updates every ticket type on this event.
+                </p>
+              </div>
             </>
           ) : (
             <>
               <p>{event.description || 'No description yet.'}</p>
               <p className="text-sm text-muted-foreground">
-                {[event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ') ||
-                  'Venue not set'}
+                {[event.venueName, event.venueCity, event.venueCountry]
+                  .filter(Boolean)
+                  .join(', ') || 'Venue not set'}
               </p>
             </>
           )}
@@ -224,7 +252,9 @@ export default function EventDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle>Ticket types</CardTitle>
-          <CardDescription>Free tickets complete immediately. Paid tickets use Stripe when configured.</CardDescription>
+          <CardDescription>
+            Free tickets complete immediately. Paid tickets use Stripe when configured.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form className="grid gap-3 md:grid-cols-[2fr_1fr_1fr_auto]" onSubmit={addTicketType}>
@@ -242,7 +272,7 @@ export default function EventDetailPage() {
               value={ticketForm.price}
               onChange={(e) => setTicketForm((prev) => ({ ...prev, price: e.target.value }))}
               className="rounded-md border px-3 py-2"
-              placeholder="Price"
+              placeholder={`Price (${event?.currency || 'ZAR'})`}
             />
             <input
               type="number"
@@ -258,7 +288,10 @@ export default function EventDetailPage() {
           </form>
           <div className="space-y-2">
             {(ticketTypes || []).map((ticket) => (
-              <div key={ticket.id} className="flex items-center justify-between rounded-lg border p-3">
+              <div
+                key={ticket.id}
+                className="flex items-center justify-between rounded-lg border p-3"
+              >
                 <div>
                   <p className="font-medium">{ticket.name}</p>
                   <p className="text-sm text-muted-foreground">

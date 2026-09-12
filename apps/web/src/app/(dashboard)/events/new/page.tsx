@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useCreateEvent } from '@/hooks/use-events';
 import { toast } from '@/components/ui/use-toast';
 import { ApiClientError } from '@/lib/api/client';
+import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -131,12 +132,18 @@ export default function CreateEventPage() {
               </div>
               <div>
                 <label className="text-sm font-medium">Currency</label>
-                <input
+                <select
                   name="currency"
                   value={form.currency}
                   onChange={onChange}
                   className="mt-1 w-full rounded-md border px-3 py-2"
-                />
+                >
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
