@@ -7,6 +7,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { useOrganization, useUpdateOrganization } from '@/hooks/use-organization';
 import { Skeleton } from '@/components/ui/loading-skeleton';
 import { toast } from '@/components/ui/use-toast';
+import { authApi } from '@/lib/api/auth';
+import { usersApi } from '@/lib/api/users';
+import { ApiClientError } from '@/lib/api/client';
+import { useAuthStore } from '@/stores/auth-store';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -34,14 +38,17 @@ export default function SettingsPage() {
   if (organization && !orgForm.name && organization.name) {
     setOrgForm({
       name: organization.name,
-      website: organization.website || '',
+      website: organization.websiteUrl || organization.website || '',
       description: organization.description || '',
     });
   }
 
   const handleUpdateOrganization = async () => {
     try {
-      await updateOrganization.mutateAsync(orgForm);
+      await updateOrganization.mutateAsync({
+        name: orgForm.name,
+        website: orgForm.website,
+      });
       toast({
         title: 'Organization updated',
         description: 'Your organization settings have been saved.',
@@ -101,7 +108,30 @@ export default function SettingsPage() {
                 Contact support to change your email address.
               </p>
             </div>
-            <Button>Save Changes</Button>
+            <Button
+              onClick={async () => {
+                try {
+                  await usersApi.updateMe(profileForm);
+                  const current = useAuthStore.getState();
+                  if (current.user) {
+                    current.setAuth(
+                      { ...current.user, ...profileForm },
+                      current.organization
+                    );
+                  }
+                  toast({ title: 'Profile updated' });
+                } catch (error) {
+                  toast({
+                    variant: 'destructive',
+                    title: 'Update failed',
+                    description:
+                      error instanceof ApiClientError ? error.message : 'Please try again.',
+                  });
+                }
+              }}
+            >
+              Save Changes
+            </Button>
           </CardContent>
         </Card>
 
@@ -203,7 +233,34 @@ export default function SettingsPage() {
                 className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-            <Button>Change Password</Button>
+            <Button
+              onClick={async () => {
+                if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+                  toast({
+                    variant: 'destructive',
+                    title: 'Passwords do not match',
+                  });
+                  return;
+                }
+                try {
+                  await authApi.changePassword({
+                    currentPassword: passwordForm.currentPassword,
+                    newPassword: passwordForm.newPassword,
+                  });
+                  setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                  toast({ title: 'Password changed' });
+                } catch (error) {
+                  toast({
+                    variant: 'destructive',
+                    title: 'Could not change password',
+                    description:
+                      error instanceof ApiClientError ? error.message : 'Please try again.',
+                  });
+                }
+              }}
+            >
+              Change Password
+            </Button>
           </CardContent>
         </Card>
 
@@ -220,7 +277,9 @@ export default function SettingsPage() {
                   Permanently delete your account and all associated data.
                 </p>
               </div>
-              <Button variant="destructive">Delete Account</Button>
+              <Button variant="destructive" disabled>
+                Not available
+              </Button>
             </div>
           </CardContent>
         </Card>

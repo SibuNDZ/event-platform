@@ -59,6 +59,17 @@ export class CheckInService {
       };
     }
 
+    const organizationId = this.tenantService.getOrganizationId();
+    if (!organizationId) {
+      throw new ForbiddenException('Organization context required');
+    }
+    if (ticket.ticketType.event.organizationId !== organizationId) {
+      return {
+        success: false,
+        message: 'Invalid QR code - ticket not found',
+      };
+    }
+
     // Verify ticket is valid
     if (ticket.status !== TicketStatus.ACTIVE) {
       return {
@@ -173,11 +184,25 @@ export class CheckInService {
   }
 
   async undoCheckIn(checkInId: string): Promise<void> {
+    const organizationId = this.tenantService.getOrganizationId();
+    if (!organizationId) {
+      throw new ForbiddenException('Organization context required');
+    }
+
     const checkIn = await this.prisma.checkIn.findUnique({
       where: { id: checkInId },
+      include: {
+        ticket: {
+          include: {
+            ticketType: {
+              include: { event: true },
+            },
+          },
+        },
+      },
     });
 
-    if (!checkIn) {
+    if (!checkIn || checkIn.ticket.ticketType.event.organizationId !== organizationId) {
       throw new NotFoundException('Check-in not found');
     }
 

@@ -9,8 +9,12 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../core/tenant/tenant.guard';
+import { Roles } from '../../core/tenant/tenant.decorator';
 import { IntegrationsService, IntegrationConfig } from './integrations.service';
 import {
   CreateApiKeyDto,
@@ -22,7 +26,9 @@ import { ApiKey } from '@event-platform/database';
 
 @ApiTags('integrations')
 @ApiBearerAuth()
-@Controller('integrations')
+@Controller({ path: 'integrations', version: '1' })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 

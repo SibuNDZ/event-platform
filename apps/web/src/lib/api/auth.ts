@@ -50,4 +50,7 @@ export const authApi = {
   getMe: () => api.get<MeResponse>('/auth/me'),
 
   getOrganizations: () => api.get<Organization[]>('/auth/organizations'),
+
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    api.post<{ message: string }>('/auth/change-password', data),
 };

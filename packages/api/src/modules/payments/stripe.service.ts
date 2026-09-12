@@ -35,6 +35,18 @@ export class StripeService {
     return this.stripe.checkout.sessions.create(params);
   }
 
+  isConfigured(): boolean {
+    return Boolean(this.stripe);
+  }
+
+  async retrieveCheckoutSession(sessionId: string) {
+    if (!this.stripe) {
+      throw new Error('Stripe not configured');
+    }
+
+    return this.stripe.checkout.sessions.retrieve(sessionId);
+  }
+
   async constructWebhookEvent(body: Buffer, signature: string) {
     if (!this.stripe) {
       throw new Error('Stripe not configured');
@@ -48,3 +60,4 @@ export class StripeService {
     return this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
   }
 }
+

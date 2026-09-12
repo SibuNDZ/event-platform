@@ -38,11 +38,12 @@ export class TenantMiddleware implements NestMiddleware {
         }
 
         // Get user's role in the organization
+        const userId = user.id || user.sub;
         const membership = await this.prisma.organizationMember.findUnique({
           where: {
             organizationId_userId: {
               organizationId: user.organizationId,
-              userId: user.sub,
+              userId,
             },
           },
         });
@@ -55,14 +56,14 @@ export class TenantMiddleware implements NestMiddleware {
         this.tenantService.setContext({
           organizationId: organization.id,
           organization,
-          userId: user.sub,
+          userId,
           role: membership.role,
         });
 
         // Attach to request for easy access
         req.tenant = {
           organizationId: organization.id,
-          userId: user.sub,
+          userId,
           role: membership.role,
         };
       } catch (error) {

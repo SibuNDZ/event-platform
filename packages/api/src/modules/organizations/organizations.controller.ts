@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/tenant/tenant.guard';
 import { Roles } from '../../core/tenant/tenant.decorator';
 import { Organization } from '@event-platform/database';
+import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
 @ApiTags('organizations')
 @Controller({ path: 'organization', version: '1' })
@@ -23,7 +24,7 @@ export class OrganizationsController {
   @Put()
   @Roles('OWNER')
   @ApiOperation({ summary: 'Update organization' })
-  async update(@Body() dto: any): Promise<Organization> {
+  async update(@Body() dto: UpdateOrganizationDto): Promise<Organization> {
     return this.organizationsService.update(dto);
   }
 

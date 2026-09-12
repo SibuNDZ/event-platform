@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   console.log('Starting application bootstrap...');
   const app = await NestFactory.create(AppModule, {
+    rawBody: true,
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
   console.log('Nest application created.');

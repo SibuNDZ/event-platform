@@ -31,6 +31,15 @@ function AuthRefreshTimer() {
   return null;
 }
 
+function AuthHydration() {
+  useEffect(() => {
+    void useAuthStore.persist.rehydrate();
+    useAuthStore.getState().setHydrated(true);
+  }, []);
+
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -47,6 +56,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <AuthHydration />
         <AuthRefreshTimer />
         {children}
         <Toaster />

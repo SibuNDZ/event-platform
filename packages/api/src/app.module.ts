@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { JwtAuthGuard } from './core/auth/guards/jwt-auth.guard';
+import { TenantContextGuard } from './core/tenant/tenant-context.guard';
+import { RolesGuard } from './core/tenant/tenant.guard';
 
 // Core modules
 import { DatabaseModule } from './core/database/database.module';
@@ -91,6 +94,18 @@ import { HealthController } from './health.controller';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: TenantContextGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
     {
       provide: APP_INTERCEPTOR,

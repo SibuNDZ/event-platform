@@ -12,12 +12,8 @@ import { format } from 'date-fns';
 export default function EventsPage() {
   const router = useRouter();
   const [page] = useState(1);
-  const { data, isLoading, error } = useEvents({ page, limit: 12 });
-
-  const handleCreateEvent = () => {
-    // TODO: Open create event modal or navigate to create page
-    console.log('Create event');
-  };
+  const { data, isLoading, error } = useEvents({ page, perPage: 12 });
+  const events = data?.items || [];
 
   if (error) {
     return (
@@ -40,9 +36,9 @@ export default function EventsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Events</h1>
-          <p className="text-muted-foreground">Manage your events and track registrations.</p>
+          <p className="text-muted-foreground">Create, publish, and run registrations.</p>
         </div>
-        <Button onClick={handleCreateEvent}>Create Event</Button>
+        <Button onClick={() => router.push('/events/new')}>Create Event</Button>
       </div>
 
       {isLoading ? (
@@ -51,21 +47,21 @@ export default function EventsPage() {
           <CardSkeleton />
           <CardSkeleton />
         </div>
-      ) : !data?.events || data.events.length === 0 ? (
+      ) : events.length === 0 ? (
         <Card>
           <EmptyState
             icon="calendar"
             title="No events yet"
-            description="Get started by creating your first event. You can set up registration, tickets, and more."
+            description="Create an event, add a ticket type, then publish the registration page."
             action={{
               label: 'Create Event',
-              onClick: handleCreateEvent,
+              onClick: () => router.push('/events/new'),
             }}
           />
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {data.events.map((event) => (
+          {events.map((event) => (
             <Card
               key={event.id}
               className="cursor-pointer hover:shadow-md transition-shadow"
@@ -94,21 +90,23 @@ export default function EventsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
-                  {event.venue && (
+                  {event.venueName && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Location</span>
-                      <span>{event.venue}</span>
+                      <span>{event.venueName}</span>
                     </div>
                   )}
-                  {event.isVirtual && (
+                  {event.type !== 'IN_PERSON' && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Type</span>
-                      <span>Virtual Event</span>
+                      <span>{event.type === 'VIRTUAL' ? 'Virtual' : 'Hybrid'}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Attendees</span>
-                    <span>{event._count?.attendees?.toLocaleString() || 0}</span>
+                    <span>
+                      {(event.attendeeCount ?? event._count?.attendees ?? 0).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -117,10 +115,10 @@ export default function EventsPage() {
         </div>
       )}
 
-      {data && data.total > data.limit && (
+      {data && data.meta.total > data.meta.perPage && (
         <div className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            Showing {data.events.length} of {data.total} events
+            Showing {events.length} of {data.meta.total} events
           </p>
         </div>
       )}

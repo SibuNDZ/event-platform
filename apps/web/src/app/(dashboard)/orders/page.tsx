@@ -6,22 +6,24 @@ import { StatsCardSkeleton, TableRowSkeleton } from '@/components/ui/loading-ske
 import { useEvents } from '@/hooks/use-events';
 
 export default function OrdersPage() {
-  const { data, isLoading, error } = useEvents({ limit: 100 });
+  const { data, isLoading, error } = useEvents({ perPage: 100 });
+  const events = data?.items || [];
 
   // Calculate stats from events data
-  const totalAttendees = data?.events?.reduce((acc, e) => acc + (e._count?.attendees || 0), 0) || 0;
+  const totalAttendees =
+    events.reduce((acc, e) => acc + (e.attendeeCount ?? e._count?.attendees ?? 0), 0) || 0;
 
   const stats = [
     { name: 'Total Registrations', value: totalAttendees.toLocaleString() },
     {
       name: 'Events with Sales',
-      value: data?.events?.filter((e) => (e._count?.attendees || 0) > 0).length.toString() || '0',
+      value: events.filter((e) => (e.attendeeCount ?? e._count?.attendees ?? 0) > 0).length.toString() || '0',
     },
     {
       name: 'Published Events',
-      value: data?.events?.filter((e) => e.status === 'PUBLISHED').length.toString() || '0',
+      value: events.filter((e) => e.status === 'PUBLISHED').length.toString() || '0',
     },
-    { name: 'Total Events', value: data?.total?.toString() || '0' },
+    { name: 'Total Events', value: data?.meta.total?.toString() || '0' },
   ];
 
   if (error) {
@@ -95,7 +97,7 @@ export default function OrdersPage() {
                 </tbody>
               </table>
             </div>
-          ) : !data?.events?.length ? (
+          ) : events.length === 0 ? (
             <EmptyState
               icon="receipt"
               title="No orders yet"
@@ -113,7 +115,7 @@ export default function OrdersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.events.map((event) => (
+                  {events.map((event) => (
                     <tr key={event.id} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4 font-medium">{event.name}</td>
                       <td className="py-3 px-4">
@@ -129,8 +131,8 @@ export default function OrdersPage() {
                           {event.status.charAt(0) + event.status.slice(1).toLowerCase()}
                         </span>
                       </td>
-                      <td className="py-3 px-4">{event._count?.attendees || 0}</td>
-                      <td className="py-3 px-4">{event._count?.ticketTypes || 0}</td>
+                      <td className="py-3 px-4">{event.attendeeCount ?? event._count?.attendees ?? 0}</td>
+                      <td className="py-3 px-4">{event.orderCount ?? event._count?.orders ?? 0}</td>
                     </tr>
                   ))}
                 </tbody>

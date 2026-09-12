@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Attendee, Prisma } from '@event-platform/database';
 import { PrismaService } from '../../core/database/prisma.service';
 import { TenantService } from '../../core/tenant/tenant.service';
-import { Attendee, Prisma } from '@event-platform/database';
+import { UpdateAttendeeDto } from './dto/attendee.dto';
 
 @Injectable()
 export class AttendeesService {
@@ -10,7 +11,7 @@ export class AttendeesService {
     private readonly tenantService: TenantService
   ) {}
 
-  async findByEvent(eventId: string, query: any = {}) {
+  async findByEvent(eventId: string, query: { page?: number; perPage?: number; search?: string } = {}) {
     await this.verifyEventAccess(eventId);
 
     const { page = 1, perPage = 50, search } = query;
@@ -32,7 +33,9 @@ export class AttendeesService {
         skip: (page - 1) * perPage,
         take: perPage,
         include: {
-          tickets: true,
+          tickets: {
+            include: { ticketType: true },
+          },
           checkIns: {
             orderBy: { checkedInAt: 'desc' },
             take: 1,
@@ -54,9 +57,11 @@ export class AttendeesService {
     };
   }
 
-  async findOne(id: string): Promise<Attendee> {
-    const attendee = await this.prisma.attendee.findUnique({
-      where: { id },
+  async findOne(eventId: string, id: string): Promise<Attendee> {
+    await this.verifyEventAccess(eventId);
+
+    const attendee = await this.prisma.attendee.findFirst({
+      where: { id, eventId },
       include: {
         tickets: {
           include: { ticketType: true },
@@ -75,12 +80,21 @@ export class AttendeesService {
     return attendee;
   }
 
-  async update(id: string, dto: any): Promise<Attendee> {
-    await this.findOne(id);
+  async update(eventId: string, id: string, dto: UpdateAttendeeDto): Promise<Attendee> {
+    await this.findOne(eventId, id);
 
     return this.prisma.attendee.update({
       where: { id },
-      data: dto,
+      data: {
+        ...(dto.firstName !== undefined && { firstName: dto.firstName }),
+        ...(dto.lastName !== undefined && { lastName: dto.lastName }),
+        ...(dto.phone !== undefined && { phone: dto.phone }),
+        ...(dto.company !== undefined && { company: dto.company }),
+        ...(dto.jobTitle !== undefined && { jobTitle: dto.jobTitle }),
+        ...(dto.bio !== undefined && { bio: dto.bio }),
+        ...(dto.photoUrl !== undefined && { photoUrl: dto.photoUrl }),
+        ...(dto.isApproved !== undefined && { isApproved: dto.isApproved }),
+      },
     });
   }
 
