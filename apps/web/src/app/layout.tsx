@@ -1,21 +1,22 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, Fraunces } from 'next/font/google';
+import { Inter, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const sans = Space_Grotesk({
+const sans = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
 });
-const display = Fraunces({
+const display = Instrument_Serif({
   subsets: ['latin'],
+  weight: '400',
   variable: '--font-display',
 });
 
 export const metadata: Metadata = {
-  title: 'Vibrant Events - Modern Event Operations',
+  title: 'Vibrant Events | Modern Event Operations',
   description:
-    "South Africa's modern event platform for registration, ticketing, check-in, and analytics at scale.",
+    'Create events, take registrations, and check people in. Stripe and email are optional extras.',
 };
 
 export default function RootLayout({
