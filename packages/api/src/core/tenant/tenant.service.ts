@@ -1,4 +1,5 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { Organization } from '@event-platform/database';
 import { TIER_FEATURES, TierFeatures } from '@event-platform/shared';
 
@@ -13,32 +14,34 @@ export interface TenantContext {
 export class TenantService {
   private context: TenantContext | null = null;
 
+  constructor(@Inject(REQUEST) private readonly request?: { tenant?: TenantContext } | null) {}
+
   setContext(context: TenantContext) {
     this.context = context;
   }
 
   getContext(): TenantContext | null {
-    return this.context;
+    return this.context ?? this.request?.tenant ?? null;
   }
 
   getOrganizationId(): string | null {
-    return this.context?.organizationId || null;
+    return this.getContext()?.organizationId || null;
   }
 
   getUserId(): string | null {
-    return this.context?.userId || null;
+    return this.getContext()?.userId || null;
   }
 
   getRole(): string | null {
-    return this.context?.role || null;
+    return this.getContext()?.role || null;
   }
 
   getOrganization(): Organization | null {
-    return this.context?.organization || null;
+    return this.getContext()?.organization || null;
   }
 
   getTierFeatures(): TierFeatures | null {
-    const org = this.context?.organization;
+    const org = this.getContext()?.organization;
     if (!org) return null;
     return TIER_FEATURES[org.licenseTier as keyof typeof TIER_FEATURES] || TIER_FEATURES.STANDARD;
   }
@@ -56,15 +59,16 @@ export class TenantService {
   }
 
   isOwner(): boolean {
-    return this.context?.role === 'OWNER';
+    return this.getContext()?.role === 'OWNER';
   }
 
   isAdmin(): boolean {
-    return this.context?.role === 'OWNER' || this.context?.role === 'ADMIN';
+    const role = this.getContext()?.role;
+    return role === 'OWNER' || role === 'ADMIN';
   }
 
   isStaff(): boolean {
-    return this.isAdmin() || this.context?.role === 'STAFF';
+    return this.isAdmin() || this.getContext()?.role === 'STAFF';
   }
 
   canManageOrganization(): boolean {
@@ -80,6 +84,6 @@ export class TenantService {
   }
 
   canViewOnly(): boolean {
-    return this.context?.role === 'VIEWER';
+    return this.getContext()?.role === 'VIEWER';
   }
 }

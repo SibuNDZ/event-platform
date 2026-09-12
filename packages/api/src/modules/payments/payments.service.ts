@@ -48,6 +48,10 @@ export class PaymentsService {
   }
 
   async getCheckoutStatus(sessionId: string): Promise<RegistrationOrderResult> {
+    if (!this.stripeService.isConfigured()) {
+      throw new BadRequestException('Stripe is not configured');
+    }
+
     const session = await this.stripeService.retrieveCheckoutSession(sessionId);
     const orderId = session.metadata?.orderId;
     if (!orderId) {
